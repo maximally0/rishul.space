@@ -65,6 +65,54 @@ function computeWindowLayout() {
 }
 
 export default function DesktopPage() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  if (isMobile) {
+    return <MobileBlock />;
+  }
+
+  return <DesktopView />;
+}
+
+function MobileBlock() {
+  return (
+    <div className="fixed inset-0 bg-black flex flex-col items-center justify-center p-8 text-center font-mono">
+      <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at center, #4a0000 0%, transparent 70%)" }} />
+      <div className="relative z-10">
+        <p className="text-5xl mb-6">👹</p>
+        <p className="text-red-500 text-xl font-bold uppercase tracking-widest mb-4">ACCESS DENIED</p>
+        <p className="text-white text-sm leading-relaxed mb-6 max-w-xs">
+          The devil does not negotiate with mobile users.
+        </p>
+        <p className="text-gray-400 text-xs leading-relaxed mb-6 max-w-xs">
+          This experience was forged for real screens. Desktops. Laptops. Tablets. Machines with keyboards and ambition.
+        </p>
+        <p className="text-gray-400 text-xs leading-relaxed mb-8 max-w-xs">
+          You want to join a hacker house but you can&apos;t be bothered to open a laptop? Go get your computer. We&apos;ll wait.
+        </p>
+        <div className="border border-red-900/50 p-4 max-w-xs">
+          <p className="text-red-400/80 text-[10px] leading-relaxed">
+            &gt; ERROR: screen.width too pathetic<br/>
+            &gt; MINIMUM_REQUIREMENT: 768px<br/>
+            &gt; YOUR_SCREEN: disappointing<br/>
+            &gt; SOLUTION: use a real computer<br/>
+            &gt; STATUS: waiting for you to try harder
+          </p>
+        </div>
+        <p className="text-gray-600 text-[9px] mt-6 italic">Hack47 respects builders who put in effort. This is the first test.</p>
+      </div>
+    </div>
+  );
+}
+
+function DesktopView() {
   const [openWindows, setOpenWindows] = useState<Record<string, boolean>>({
     main: true,
     perks: true,
