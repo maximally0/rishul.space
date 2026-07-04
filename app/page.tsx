@@ -148,6 +148,7 @@ export default function DesktopPage() {
         <DesktopIcon icon={Globe} label="Builder Portal" onClick={() => window.open("https://tally.so/r/hack47", "_blank")} />
         <DesktopIcon icon={Folder} label="House_Photos" onClick={() => toggleWindow("photos", true)} />
         <DesktopIcon icon={Users} label="Residents" onClick={() => toggleWindow("residents", true)} />
+        <DesktopIcon icon={Globe} label="LinkedIn" onClick={() => window.open("https://www.linkedin.com/company/hack47", "_blank")} />
       </div>
 
       {/* ═══════ WINDOWS (2×2 grid, never overlapping) ═══════ */}
