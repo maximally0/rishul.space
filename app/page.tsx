@@ -172,7 +172,7 @@ export default function DesktopPage() {
             <div className="bg-black text-electric-yellow p-2 md:p-3 font-mono text-[9px] md:text-[11px] mb-3 border-l-4 border-electric-yellow">
               <p>&gt; INITIALIZING DELHI&apos;S FIRST HACKER HOUSE...</p>
               <p>&gt; STATUS: PURE CHAOS DETECTED</p>
-              <p>&gt; LOCATION: SOUTH DELHI VILLA</p>
+              <p>&gt; LOCATION: DELHI VILLA</p>
               <p>&gt; OCT 15 - NOV 15</p>
             </div>
             <p className="font-serif italic text-[clamp(11px,1.3vw,18px)] text-gray-700 leading-snug border-l-4 border-gray-300 pl-2">
@@ -728,7 +728,7 @@ function SystemSpecs() {
       <div className="space-y-2 text-[9px]">
         <div className="border-b border-gray-200 pb-1.5">
           <p className="font-bold text-blue-700">📍 LOCATION</p>
-          <p className="text-gray-600 pl-3">South Delhi, Premium Villa</p>
+          <p className="text-gray-600 pl-3">Delhi, Premium Villa</p>
           <p className="text-gray-600 pl-3">4BHK + Terrace + Garden</p>
         </div>
         <div className="border-b border-gray-200 pb-1.5">
@@ -751,7 +751,7 @@ function SystemSpecs() {
         </div>
         <div>
           <p className="font-bold text-red-700">🌅 GPU (Graphics)</p>
-          <p className="text-gray-600 pl-3">South Delhi sunset view</p>
+          <p className="text-gray-600 pl-3">Delhi sunset view</p>
           <p className="text-gray-600 pl-3">Resolution: 4K terrace panorama</p>
           <p className="text-gray-600 pl-3">Refresh rate: Every evening</p>
         </div>
