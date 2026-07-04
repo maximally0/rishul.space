@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     default: "Hack47",
     template: "%s | Hack47",
   },
-  description: "Delhi's first hacker house. A 30-day residency for 16 builders who ship fast, sleep less, and build what matters. Delhi. Oct 15 – Nov 15.",
+  description: "Delhi's first hacker house. A 30-day residency for 16 builders who ship fast, sleep less, and build what matters. Delhi. Sept 15 – Oct 15.",
   keywords: ["hacker house", "Delhi", "residency", "builders", "startup", "coliving", "hackathon", "Hack47", "India"],
   authors: [{ name: "Hack47" }],
   creator: "Hack47",

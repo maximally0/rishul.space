@@ -174,7 +174,7 @@ export default function DesktopPage() {
               <p>&gt; INITIALIZING DELHI&apos;S FIRST HACKER HOUSE...</p>
               <p>&gt; STATUS: PURE CHAOS DETECTED</p>
               <p>&gt; LOCATION: DELHI VILLA</p>
-              <p>&gt; OCT 15 - NOV 15</p>
+              <p>&gt; SEPT 15 - OCT 15</p>
             </div>
             <p className="font-serif italic text-[clamp(11px,1.3vw,18px)] text-gray-700 leading-snug border-l-4 border-gray-300 pl-2">
               &quot;A 30-day residency for 16 builders who care more about their Git history than their sleep schedule.&quot;
