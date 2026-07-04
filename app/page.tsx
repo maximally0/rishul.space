@@ -591,8 +591,12 @@ function SoulForm({ onClose }: { onClose: () => void }) {
     setError("");
 
     if (isLast) {
+      // Submit to Google Sheets
+      fetch("https://script.google.com/macros/s/AKfycbxfqO1VrEUves58l8qfU6Jq2sKUwawN4SLBi4TXOOHjO8vpoV7_HMvtocGUiLtLmi7DTA/exec", {
+        method: "POST",
+        body: JSON.stringify(answers),
+      }).catch(() => {});
       setSubmitted(true);
-      console.log("Form submitted:", answers);
     } else {
       setStep((s) => s + 1);
     }
