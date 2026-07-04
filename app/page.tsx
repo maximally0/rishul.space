@@ -488,7 +488,9 @@ function SoulForm({ onClose }: { onClose: () => void }) {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [honeypot, setHoneypot] = useState("");
   const questionRef = useRef<HTMLDivElement>(null);
 
   const q = FORM_QUESTIONS[step];
@@ -591,6 +593,16 @@ function SoulForm({ onClose }: { onClose: () => void }) {
     setError("");
 
     if (isLast) {
+      // Bot check: if honeypot field is filled, silently fake success
+      if (honeypot) {
+        setSubmitted(true);
+        return;
+      }
+
+      // Prevent double submission
+      if (isSubmitting) return;
+      setIsSubmitting(true);
+
       // Submit to Google Sheets
       fetch("https://script.google.com/macros/s/AKfycbxfqO1VrEUves58l8qfU6Jq2sKUwawN4SLBi4TXOOHjO8vpoV7_HMvtocGUiLtLmi7DTA/exec", {
         method: "POST",
@@ -736,6 +748,18 @@ function SoulForm({ onClose }: { onClose: () => void }) {
           )}
         </div>
 
+        {/* Honeypot - hidden from humans, bots fill it */}
+        <input
+          type="text"
+          name="website_url"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          className="absolute opacity-0 pointer-events-none h-0 w-0 overflow-hidden"
+          aria-hidden="true"
+        />
+
         {/* Navigation */}
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
@@ -756,10 +780,10 @@ function SoulForm({ onClose }: { onClose: () => void }) {
           </div>
           <button
             onClick={handleNext}
-            disabled={!currentValue.trim()}
+            disabled={!currentValue.trim() || isSubmitting}
             className="px-6 py-2 bg-red-700 text-white font-mono text-xs font-bold uppercase tracking-wider disabled:opacity-20 disabled:cursor-not-allowed hover:bg-red-600 active:translate-y-px transition-all border border-red-500/30 shadow-[0_0_15px_rgba(200,0,0,0.2)]"
           >
-            {isLast ? "🔥 SUBMIT SOUL" : "NEXT →"}
+            {isSubmitting ? "SUBMITTING..." : isLast ? "🔥 SUBMIT SOUL" : "NEXT →"}
           </button>
         </div>
 
