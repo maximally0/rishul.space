@@ -18,22 +18,56 @@ const fontMono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "HACK47 OS | Delhi's First Hacker House",
-  description: "A 30-day residency for 16 builders who care more about their Git history than their sleep schedule. Join the chaos in South Delhi.",
+  metadataBase: new URL("https://hack47.com"),
+  title: {
+    default: "Hack47",
+    template: "%s | Hack47",
+  },
+  description: "Delhi's first hacker house. A 30-day residency for 16 builders who ship fast, sleep less, and build what matters. South Delhi. Oct 15 – Nov 15.",
+  keywords: ["hacker house", "Delhi", "residency", "builders", "startup", "coliving", "South Delhi", "hackathon", "Hack47", "India"],
+  authors: [{ name: "Hack47" }],
+  creator: "Hack47",
+  publisher: "Hack47",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
-    title: "HACK47 OS",
-    description: "Delhi's First Hacker House. Residency for extreme builders.",
-    images: ["/opengraph-image.png"],
+    type: "website",
+    locale: "en_IN",
+    url: "https://hack47.com",
+    siteName: "Hack47",
+    title: "Hack47 — Delhi's First Hacker House",
+    description: "30 days. 16 builders. One South Delhi villa. No distractions, just shipping. Apply now.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Hack47 — Delhi's First Hacker House",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "HACK47 OS",
-    description: "Join the hacker house in Delhi.",
-    images: ["/opengraph-image.png"],
+    title: "Hack47 — Delhi's First Hacker House",
+    description: "30 days. 16 builders. One villa. Pure chaos. Apply now.",
+    images: ["/og-image.png"],
+    creator: "@hack47_",
   },
   icons: {
     icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({

@@ -1,0 +1,16 @@
+{
+  "name": "Hack47",
+  "short_name": "Hack47",
+  "description": "Delhi's First Hacker House",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#008080",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}
