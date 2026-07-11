@@ -1,62 +1,39 @@
-# Hack47
+# rishul.space
 
-Delhi's first hacker house. A 30-day residency for 16 builders who ship fast, sleep less, and build what matters.
+my personal website. a windows 98-style desktop OS where everything floats, my photos run away from your cursor, and vibes are mandatory.
 
-**Sept 15 – Oct 15 | Delhi**
+## what's on here
 
-## What is this
+- **RISHUL.EXE** — who i am, one terminal boot sequence
+- **NOW.TXT** — what i'm actively working on
+- **CONTACT.EXE** — twitter, linkedin, instagram, email
+- **ABOUT.SYS** — the simple version
+- **GET_FIT.EXE** — my public weight loss journey (tracked on Notion)
+- **floating photos** — whimsical pics that scatter when you hover near them
+- **clouds, sun, birds** — because vibes
 
-A Windows XP-themed website for Hack47, a hacker house residency in Delhi. The entire site is designed as an interactive desktop environment with draggable windows, floating animations, dynamic clouds, and a built-in "Sell Your Soul" application form.
+## tech
 
-## Tech Stack
+- next.js 16 (app router)
+- tailwind css 4
+- gsap (animations, draggable windows, floating photos)
+- deployed on vercel
 
-- **Framework:** Next.js 16 (App Router)
-- **Styling:** Tailwind CSS v4
-- **Animations:** GSAP (GreenSock) + Draggable plugin
-- **Fonts:** Anton, IBM Plex Mono
-- **Deployment:** Netlify / Vercel
-
-## Getting Started
+## run locally
 
 ```bash
+git clone https://github.com/yourusername/rishul.space.git
+cd rishul.space
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+> **important**: don't run this from a OneDrive/cloud-synced folder. the 30K+ files in node_modules will fight your cloud sync and crash everything.
 
-## Features
+## deploy
 
-- Windows XP desktop environment with draggable, floating windows
-- 2x2 grid layout that adapts to any screen size (no overlapping)
-- Dynamic cloud layer with GSAP-animated drift and bob
-- In-page typeform-style application ("Sell Your Soul") with field validation
-- Photo gallery with prev/next navigation
-- System specs, residents panel, and error dialogs
-- Mobile users are blocked (intentionally) — desktop only experience
-- Full SEO: Open Graph, Twitter Cards, sitemap, robots.txt, web manifest
+push to main → vercel auto-deploys to [rishul.space](https://rishul.space)
 
-## Mobile Policy
+## license
 
-This site intentionally does not support mobile. If someone opens it on a phone, they get a full-screen blocker telling them to use a real computer. This is by design — the Windows XP desktop experience requires a proper screen.
-
-## Structure
-
-```
-app/
-  page.tsx        — Main desktop page + all window components
-  layout.tsx      — Root layout, fonts, metadata/SEO
-  globals.css     — Tailwind config, custom utilities, theme
-  sitemap.ts      — Auto-generated sitemap
-components/
-  win-window.tsx  — Draggable, floating Windows XP window component
-  taskbar.tsx     — Bottom taskbar with clock and active tasks
-  desktop-icon.tsx — Desktop shortcut icons
-public/
-  favicon.ico, apple-touch-icon.png, android-chrome-*.png
-  robots.txt, site.webmanifest
-```
-
-## License
-
-Private. All rights reserved.
+do whatever you want with the code. the photos are mine tho.
