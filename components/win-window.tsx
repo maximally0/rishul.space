@@ -17,9 +17,7 @@ interface WinWindowProps {
   onClose?: () => void;
   className?: string;
   titleBarClassName?: string;
-  /** Pixel X computed by parent */
   startX?: number;
-  /** Pixel Y computed by parent */
   startY?: number;
   isActive?: boolean;
   onActivate?: () => void;

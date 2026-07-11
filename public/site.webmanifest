@@ -1,11 +1,11 @@
 {
-  "name": "Hack47",
-  "short_name": "Hack47",
-  "description": "Delhi's First Hacker House",
+  "name": "rishul.space",
+  "short_name": "rishul",
+  "description": "Rishul Chanana — Builder, Operator, Drug Dealer",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#008080",
-  "theme_color": "#000000",
+  "background_color": "#0f0c29",
+  "theme_color": "#533483",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

@@ -2,66 +2,46 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { Monitor, Trash2, Globe, Folder, AlertTriangle, Users } from "lucide-react";
+import { Monitor, Trash2, Globe, Coffee, Dumbbell } from "lucide-react";
 import { WinWindow } from "@/components/win-window";
 import { DesktopIcon } from "@/components/desktop-icon";
 import { Taskbar } from "@/components/taskbar";
 import { cn } from "@/lib/utils";
 
-const CLOUD_URLS = [
-  "https://images.unsplash.com/photo-1603437873662-dc1f44901825?auto=format&w=400&q=80",
-  "https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?auto=format&w=400&q=80",
+const RISHUL_PHOTOS = [
+  "/rishul-1.jpeg",
+  "/rishul-2.jpeg",
+  "/rishul-3.jpeg",
+  "/rishul-4.jpeg",
+  "/rishul-5.jpeg",
+  "/rishul-6.jpeg",
+  "/rishul-7.jpeg",
+  "/rishul-8.jpeg",
 ];
 
-const SUN_SVG = "https://cdn.jsdelivr.net/npm/game-icons-transparent@latest/svgs/caro-asercion/heraldic-sun.svg";
-const BIRD_SVG = "https://cdn.jsdelivr.net/npm/game-icons-transparent@latest/svgs/lorc/bird-limb.svg";
-const FLOWER_SVG = "https://cdn.jsdelivr.net/npm/game-icons-transparent@latest/svgs/lorc/twirly-flower.svg";
-const SHIELD_SVG = "https://cdn.jsdelivr.net/npm/game-icons-transparent@latest/svgs/lorc/checked-shield.svg";
-
-/**
- * Compute window positions as a 2x2 grid with gutters.
- * Takes the available viewport minus the icon column (80px) and taskbar (36px).
- * Returns pixel positions for each of the 4 windows.
- */
 function computeWindowLayout() {
   if (typeof window === "undefined") {
-    return { main: { x: 100, y: 30 }, perks: { x: 550, y: 30 }, photos: { x: 550, y: 350 }, error: { x: 100, y: 400 }, soul: { x: 350, y: 180 }, team: { x: 250, y: 100 }, residents: { x: 350, y: 120 }, specs: { x: 300, y: 200 } };
+    return { main: { x: 100, y: 30 }, now: { x: 550, y: 30 }, contact: { x: 350, y: 180 }, about: { x: 300, y: 200 } };
   }
-
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const iconCol = 85;
   const taskbarH = 36;
   const gutter = 12;
-
   const availW = vw - iconCol - gutter * 3;
   const availH = vh - taskbarH - gutter * 3;
-
   const colW = Math.floor(availW / 2);
-  const rowH = Math.floor(availH / 2);
-
   const col1X = iconCol + gutter;
   const col2X = iconCol + gutter + colW + gutter;
-  const row1Y = gutter;
-  const row2Y = gutter + rowH + gutter;
-
-  // Extra windows cascade from center
-  const centerX = iconCol + Math.floor(availW / 3);
-  const centerY = Math.floor(availH / 4);
-
-  // Soul window: dead center of the screen
-  const soulX = iconCol + Math.floor(availW / 2) - 130;
-  const soulY = Math.floor(availH / 2) - 80;
+  const row1Y = gutter + 20;
+  const centerX = iconCol + Math.floor(availW / 2) - 130;
+  const centerY = Math.floor(availH / 2) - 80;
 
   return {
     main: { x: col1X, y: row1Y },
-    perks: { x: col2X, y: row1Y },
-    photos: { x: col2X, y: row2Y },
-    error: { x: col1X, y: row2Y },
-    soul: { x: soulX, y: soulY },
-    team: { x: centerX - 20, y: centerY },
-    residents: { x: centerX + 30, y: centerY + 40 },
-    specs: { x: centerX + 60, y: centerY + 80 },
+    now: { x: col2X, y: row1Y },
+    contact: { x: centerX, y: centerY },
+    about: { x: col1X + 40, y: Math.floor(availH / 2) + 20 },
   };
 }
 
@@ -75,953 +55,440 @@ export default function DesktopPage() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  if (isMobile) {
-    return <MobileBlock />;
-  }
-
+  if (isMobile) return <MobileView />;
   return <DesktopView />;
 }
 
-function MobileBlock() {
+// ─── Whimsical Photos that float around and run from cursor ──────────────────
+
+function FloatingPhotos() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const photosRef = useRef<HTMLImageElement[]>([]);
+  const mouseRef = useRef({ x: -1000, y: -1000 });
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    // Give each photo a random starting position and gentle float
+    photosRef.current.forEach((img) => {
+      if (!img) return;
+      const startX = Math.random() * (window.innerWidth - 120);
+      const startY = Math.random() * (window.innerHeight - 160);
+      gsap.set(img, { x: startX, y: startY, rotation: (Math.random() - 0.5) * 20 });
+
+      // Random gentle floating
+      gsap.to(img, {
+        x: `+=${(Math.random() - 0.5) * 200}`,
+        y: `+=${(Math.random() - 0.5) * 150}`,
+        rotation: (Math.random() - 0.5) * 15,
+        duration: 4 + Math.random() * 4,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut",
+        delay: Math.random() * 3,
+      });
+    });
+
+    // Track mouse
+    const handleMouse = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY };
+    };
+    window.addEventListener("mousemove", handleMouse);
+
+    // Repel from cursor
+    const repelInterval = setInterval(() => {
+      const mx = mouseRef.current.x;
+      const my = mouseRef.current.y;
+
+      photosRef.current.forEach((img) => {
+        if (!img) return;
+        const rect = img.getBoundingClientRect();
+        const imgCenterX = rect.left + rect.width / 2;
+        const imgCenterY = rect.top + rect.height / 2;
+        const dx = imgCenterX - mx;
+        const dy = imgCenterY - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 200) {
+          const force = (200 - dist) / 200;
+          const angle = Math.atan2(dy, dx);
+          gsap.to(img, {
+            x: `+=${Math.cos(angle) * force * 80}`,
+            y: `+=${Math.sin(angle) * force * 80}`,
+            rotation: `+=${(Math.random() - 0.5) * 20}`,
+            duration: 0.6,
+            ease: "power2.out",
+            overwrite: "auto",
+          });
+        }
+      });
+    }, 100);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouse);
+      clearInterval(repelInterval);
+    };
+  }, []);
+
   return (
-    <div className="fixed inset-0 bg-black flex flex-col items-center justify-center p-8 text-center font-mono">
-      <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at center, #4a0000 0%, transparent 70%)" }} />
-      <div className="relative z-10">
-        <p className="text-5xl mb-6">👹</p>
-        <p className="text-red-500 text-xl font-bold uppercase tracking-widest mb-4">ACCESS DENIED</p>
-        <p className="text-white text-sm leading-relaxed mb-6 max-w-xs">
-          The devil does not negotiate with mobile users.
-        </p>
-        <p className="text-gray-400 text-xs leading-relaxed mb-6 max-w-xs">
-          This experience was forged for real screens. Desktops. Laptops. Tablets. Machines with keyboards and ambition.
-        </p>
-        <p className="text-gray-400 text-xs leading-relaxed mb-8 max-w-xs">
-          You want to join a hacker house but you can&apos;t be bothered to open a laptop? Go get your computer. We&apos;ll wait.
-        </p>
-        <div className="border border-red-900/50 p-4 max-w-xs">
-          <p className="text-red-400/80 text-[10px] leading-relaxed">
-            &gt; ERROR: screen.width too pathetic<br/>
-            &gt; MINIMUM_REQUIREMENT: 768px<br/>
-            &gt; YOUR_SCREEN: disappointing<br/>
-            &gt; SOLUTION: use a real computer<br/>
-            &gt; STATUS: waiting for you to try harder
-          </p>
-        </div>
-        <p className="text-gray-600 text-[9px] mt-6 italic">Hack47 respects builders who put in effort. This is the first test.</p>
+    <div ref={containerRef} className="absolute inset-0 pointer-events-none z-[3] overflow-hidden">
+      {RISHUL_PHOTOS.map((src, i) => (
+        <img
+          key={i}
+          ref={(el) => { if (el) photosRef.current[i] = el; }}
+          src={src}
+          alt=""
+          className="absolute w-[100px] h-[130px] object-cover rounded border-[3px] border-white shadow-[4px_4px_20px_rgba(0,0,0,0.4)] opacity-80 hover:opacity-100 transition-opacity pointer-events-auto cursor-grab active:cursor-grabbing"
+          style={{ willChange: "transform" }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// ─── Nature Layer (clouds, sun, birds) ───────────────────────────────────────
+
+function NatureLayer() {
+  const layerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!layerRef.current) return;
+    const clouds = layerRef.current.querySelectorAll(".cloud");
+    clouds.forEach((cloud, i) => {
+      gsap.fromTo(cloud,
+        { x: -300 },
+        { x: window.innerWidth + 300, duration: 55 + i * 18, repeat: -1, ease: "none", delay: i * 12 }
+      );
+    });
+    const birds = layerRef.current.querySelectorAll(".bird");
+    birds.forEach((bird, i) => {
+      gsap.fromTo(bird,
+        { x: -80, y: 140 + Math.random() * 80 },
+        { x: window.innerWidth + 80, y: 120 + Math.random() * 60, duration: 22 + i * 8, repeat: -1, ease: "none", delay: i * 6 }
+      );
+    });
+  }, []);
+
+  return (
+    <div ref={layerRef} className="absolute inset-0 pointer-events-none overflow-hidden z-[1]">
+      <div className="cloud absolute top-[18%] w-[280px] h-[70px] bg-white/25 rounded-full blur-md" />
+      <div className="cloud absolute top-[30%] w-[350px] h-[90px] bg-white/18 rounded-full blur-lg" />
+      <div className="cloud absolute top-[45%] w-[220px] h-[55px] bg-white/15 rounded-full blur-md" />
+      <div className="cloud absolute top-[55%] w-[300px] h-[65px] bg-white/12 rounded-full blur-lg" />
+      {[0, 1, 2, 3].map((i) => (
+        <svg key={i} className="bird absolute w-6 h-4 opacity-50" viewBox="0 0 24 12">
+          <path d="M0 6 Q6 0 12 6 Q18 0 24 6" fill="none" stroke="rgba(0,0,0,0.6)" strokeWidth="1.5" />
+        </svg>
+      ))}
+      <div className="absolute top-4 right-6 w-24 h-24 md:w-32 md:h-32">
+        <div className="w-full h-full rounded-full bg-gradient-to-br from-yellow-200 via-yellow-400 to-orange-500 shadow-[0_0_80px_rgba(255,200,0,0.7),0_0_160px_rgba(255,150,0,0.3)] animate-pulse" />
+      </div>
+      <div className="absolute top-14 right-28 w-48 h-[2px] bg-gradient-to-r from-transparent via-yellow-200/60 to-transparent rotate-[-15deg]" />
+      <div className="absolute top-20 right-12 w-36 h-[1px] bg-gradient-to-r from-transparent via-orange-200/40 to-transparent rotate-[20deg]" />
+    </div>
+  );
+}
+
+// ─── Mobile View ─────────────────────────────────────────────────────────────
+
+function MobileView() {
+  return (
+    <div className="min-h-screen text-white font-mono p-4 pb-20" style={{
+      background: "linear-gradient(180deg, #1a6b8a 0%, #2d8a6e 30%, #1a5c3a 100%)"
+    }}>
+      <div className="mb-6 p-4 bg-black/30 backdrop-blur-sm border border-white/10 rounded">
+        <h1 className="font-[var(--font-anton)] text-4xl tracking-tight mb-1">RISHUL.SPACE</h1>
+        <p className="text-xs text-white/60">the personal OS of rishul chanana</p>
+      </div>
+      <MobileCard title="RISHUL.EXE"><RishulBio /></MobileCard>
+      <MobileCard title="NOW.TXT"><NowContent /></MobileCard>
+      <MobileCard title="CONTACT.EXE"><ContactContent /></MobileCard>
+      <MobileCard title="ABOUT.SYS"><AboutContent /></MobileCard>
+      <MobileCard title="GET_FIT.EXE"><FitnessContent /></MobileCard>
+      {/* Photo scatter */}
+      <div className="mt-4 mb-4 overflow-x-auto flex gap-2 pb-2">
+        {RISHUL_PHOTOS.map((src, i) => (
+          <img key={i} src={src} alt="" className="h-28 w-auto object-cover rounded border-2 border-white/30 shrink-0 shadow-lg" style={{ transform: `rotate(${(i % 2 === 0 ? -1 : 1) * (2 + i)}deg)` }} />
+        ))}
+      </div>
+      <div className="mt-4 text-center text-[9px] text-white/40 border-t border-white/10 pt-4">
+        <p>rishul.space © 2026</p>
       </div>
     </div>
   );
 }
 
+function MobileCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-3 bg-[#c0c0c0] win-border-outset overflow-hidden">
+      <div className="bg-gradient-to-r from-[#0058ee] to-[#3789f8] px-2 py-1 text-[11px] font-bold text-white">{title}</div>
+      <div className="p-0.5 m-[3px] win-border-inset bg-white text-black">{children}</div>
+    </div>
+  );
+}
+
+// ─── Desktop View ────────────────────────────────────────────────────────────
+
 function DesktopView() {
   const [openWindows, setOpenWindows] = useState<Record<string, boolean>>({
     main: true,
-    perks: true,
-    photos: true,
-    error: true,
-    soul: true,
-    team: false,
-    residents: false,
-    specs: false,
+    now: true,
+    contact: true,
+    fitness: false,
+    about: false,
   });
-  const [windowOrder, setWindowOrder] = useState<string[]>(["soul", "main", "perks", "photos", "error", "team", "residents", "specs"]);
+  const [windowOrder, setWindowOrder] = useState<string[]>(["contact", "main", "now", "fitness", "about"]);
   const [clippyVisible, setClippyVisible] = useState(false);
-  const [showForm, setShowForm] = useState(false);
   const [layout, setLayout] = useState(computeWindowLayout);
 
-  const desktopRef = useRef<HTMLDivElement>(null);
-
-  // Recompute layout on mount (SSR → client)
-  useEffect(() => {
-    setLayout(computeWindowLayout());
-  }, []);
+  useEffect(() => { setLayout(computeWindowLayout()); }, []);
 
   const toggleWindow = (id: string, state?: boolean) => {
     setOpenWindows((prev) => ({ ...prev, [id]: state ?? !prev[id] }));
-    if (state !== false) {
-      bringToFront(id);
-    }
+    if (state !== false) bringToFront(id);
   };
-
-  const bringToFront = (id: string) => {
-    setWindowOrder((prev) => [id, ...prev.filter((w) => w !== id)]);
-  };
-
-  const getZIndex = (id: string) => {
-    const index = windowOrder.indexOf(id);
-    return 100 - index;
-  };
+  const bringToFront = (id: string) => setWindowOrder((prev) => [id, ...prev.filter((w) => w !== id)]);
+  const getZIndex = (id: string) => 100 - windowOrder.indexOf(id);
 
   const activeTasks = Object.entries(openWindows)
     .filter(([_, isOpen]) => isOpen)
-    .map(([id]) => ({
-      id,
-      title: getWindowTitle(id),
-    }));
+    .map(([id]) => ({ id, title: getWindowTitle(id) }));
 
   function getWindowTitle(id: string) {
     switch (id) {
-      case "main": return "C:\\SYSTEM\\HACK47_OS.EXE";
-      case "perks": return "README_FIRST.TXT";
-      case "photos": return "HOUSE_PHOTOS.EXE";
-      case "error": return "System Error";
-      case "soul": return "⚠ SELL_YOUR_SOUL.EXE";
-      case "team": return "ARCHDEMONS.SYS";
-      case "residents": return "RESIDENTS.DAT";
-      case "specs": return "SYSTEM_SPECS.INF";
+      case "main": return "RISHUL.EXE";
+      case "now": return "NOW.TXT";
+      case "contact": return "⚡ CONTACT.EXE";
+      case "fitness": return "GET_FIT.EXE";
+      case "about": return "ABOUT.SYS";
       default: return id;
     }
   }
 
   return (
     <div
-      ref={desktopRef}
-      className="desktop-environment relative w-full h-screen bg-[#008080] overflow-hidden font-win"
+      className="desktop-environment relative w-full h-screen overflow-hidden font-win"
       style={{
-        backgroundImage: "url('https://images.unsplash.com/photo-1603437873662-dc1f44901825?auto=format&w=2000&q=80&fit=crop')",
+        backgroundImage: "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&w=2000&q=80&fit=crop')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      {/* Dynamic Clouds & Nature */}
+      {/* Nature — clouds, sun, birds */}
       <NatureLayer />
 
-      <img
-        src={SUN_SVG}
-        className="sun-element absolute top-4 right-4 w-16 h-16 md:w-24 md:h-24 lg:w-28 lg:h-28 z-5 drop-shadow-[0_0_40px_#FAFF00] animate-pulse pointer-events-none"
-        alt="Heraldic Sun"
-      />
+      {/* Your photos floating whimsically and running from cursor */}
+      <FloatingPhotos />
 
       {/* Desktop Icons */}
       <div className="desktop-icons absolute top-4 left-3 flex flex-col gap-3 z-20">
-        <DesktopIcon icon={Monitor} label="My Computer" onClick={() => toggleWindow("specs", true)} />
-        <DesktopIcon icon={Trash2} label="Recycle Bin" onClick={() => alert("Emptying bin...")} />
-        <DesktopIcon icon={Globe} label="The Devils" onClick={() => toggleWindow("team", true)} />
-        <DesktopIcon icon={Folder} label="House_Photos" onClick={() => toggleWindow("photos", true)} />
-        <DesktopIcon icon={Users} label="Residents" onClick={() => toggleWindow("residents", true)} />
-        <DesktopIcon icon={Globe} label="LinkedIn" onClick={() => window.open("https://www.linkedin.com/company/hack47", "_blank")} />
+        <DesktopIcon icon={Monitor} label="About Me" onClick={() => toggleWindow("about", true)} />
+        <DesktopIcon icon={Trash2} label="Killed Ideas" onClick={() => alert("💀 RIP: 47 abandoned side projects, 3 startup pivots, and that one app I built at 3AM that made absolutely no sense in daylight.")} />
+        <DesktopIcon icon={Globe} label="Socials" onClick={() => toggleWindow("contact", true)} />
+        <DesktopIcon icon={Coffee} label="Now" onClick={() => toggleWindow("now", true)} />
+        <DesktopIcon icon={Dumbbell} label="Get Fit" onClick={() => toggleWindow("fitness", true)} />
       </div>
 
-      {/* ═══════ WINDOWS (2×2 grid, never overlapping) ═══════ */}
+      {/* ═══════ WINDOWS ═══════ */}
 
       {openWindows.main && (
-        <WinWindow
-          id="main"
-          title="C:\SYSTEM\HACK47_OS.EXE"
-          startX={layout.main.x}
-          startY={layout.main.y}
+        <WinWindow id="main" title="C:\RISHUL\RISHUL.EXE" startX={layout.main.x} startY={layout.main.y}
           className="w-[45vw] min-w-[260px] max-w-[520px]"
-          isActive={windowOrder[0] === "main"}
-          zIndex={getZIndex("main")}
-          onActivate={() => bringToFront("main")}
-          onClose={() => toggleWindow("main", false)}
-          floating={true}
-        >
-          <div className="p-3 md:p-4">
-            <h1 className="font-syne text-[clamp(36px,7vw,100px)] leading-none tracking-tighter text-black uppercase mb-3 select-none whitespace-nowrap">
-              HACK<a href="https://en.wikipedia.org/wiki/Indian_independence_movement" target="_blank" rel="noopener noreferrer" className="hover:text-electric-yellow hover:bg-black px-0.5 transition-colors duration-200 cursor-pointer">47</a>
-            </h1>
-            <div className="bg-black text-electric-yellow p-2 md:p-3 font-mono text-[9px] md:text-[11px] mb-3 border-l-4 border-electric-yellow">
-              <p>&gt; INITIALIZING DELHI&apos;S FIRST HACKER HOUSE...</p>
-              <p>&gt; STATUS: PURE CHAOS DETECTED</p>
-              <p>&gt; LOCATION: DELHI VILLA</p>
-              <p>&gt; SEPT 15 - OCT 15</p>
-            </div>
-            <p className="font-serif italic text-[clamp(11px,1.3vw,18px)] text-gray-700 leading-snug border-l-4 border-gray-300 pl-2">
-              &quot;A 30-day residency for 16 builders who care more about their Git history than their sleep schedule.&quot;
-            </p>
-          </div>
+          isActive={windowOrder[0] === "main"} zIndex={getZIndex("main")}
+          onActivate={() => bringToFront("main")} onClose={() => toggleWindow("main", false)} floating={true}>
+          <RishulBio />
         </WinWindow>
       )}
 
-      {openWindows.perks && (
-        <WinWindow
-          id="perks"
-          title="README_FIRST.TXT"
-          startX={layout.perks.x}
-          startY={layout.perks.y}
-          className="w-[40vw] min-w-[220px] max-w-[320px]"
-          titleBarClassName="bg-[#800000]"
-          isActive={windowOrder[0] === "perks"}
-          zIndex={getZIndex("perks")}
-          onActivate={() => bringToFront("perks")}
-          onClose={() => toggleWindow("perks", false)}
-          floating={true}
-        >
-          <div className="p-3 font-mono text-[11px] text-black">
-            <p className="font-bold underline mb-3 uppercase">HOUSE PROTOCOLS:</p>
-            <ul className="space-y-3 mb-4">
-              <li className="text-black">- <span className="font-bold">LAUNDRY.SYS</span>: We wash the socks. You build the robots.</li>
-              <li className="text-black">- <span className="font-bold">FOOD.EXE</span>: High-protein fuel. Optimized for latency.</li>
-              <li className="text-black">- <span className="font-bold">SLEEP.DLL</span>: Optional. Not recommended during demo day.</li>
-            </ul>
-            <div className="p-3 border-2 border-dashed border-red-500 bg-red-50/70">
-              <p className="text-[11px] leading-relaxed text-black">Highly addictive environment. May cause sudden career pivots.</p>
-            </div>
-          </div>
+      {openWindows.now && (
+        <WinWindow id="now" title="NOW.TXT" startX={layout.now.x} startY={layout.now.y}
+          className="w-[40vw] min-w-[220px] max-w-[320px]" titleBarClassName="bg-[#800000]"
+          isActive={windowOrder[0] === "now"} zIndex={getZIndex("now")}
+          onActivate={() => bringToFront("now")} onClose={() => toggleWindow("now", false)} floating={true}>
+          <NowContent />
         </WinWindow>
       )}
 
-      {openWindows.photos && (
-        <WinWindow
-          id="photos"
-          title="HOUSE_PHOTOS.EXE"
-          startX={layout.photos.x}
-          startY={layout.photos.y}
-          className="w-[40vw] min-w-[220px] max-w-[360px]"
-          isActive={windowOrder[0] === "photos"}
-          zIndex={getZIndex("photos")}
-          onActivate={() => bringToFront("photos")}
-          onClose={() => toggleWindow("photos", false)}
-          floating={true}
-        >
-          <HousePhotosGallery />
+      {openWindows.contact && (
+        <WinWindow id="contact" title="⚡ LETS_CONNECT.EXE" startX={layout.contact.x} startY={layout.contact.y}
+          className="w-[32vw] min-w-[250px] max-w-[300px]" titleBarClassName="bg-[#cc0000]"
+          isActive={windowOrder[0] === "contact"} zIndex={getZIndex("contact")}
+          onActivate={() => bringToFront("contact")} onClose={() => toggleWindow("contact", false)} floating={true}>
+          <ContactContent />
         </WinWindow>
       )}
 
-      {openWindows.error && (
-        <WinWindow
-          id="error"
-          title="System Error"
-          startX={layout.error.x}
-          startY={layout.error.y}
-          className="w-[38vw] min-w-[220px] max-w-[300px]"
-          titleBarClassName="bg-[#808080]"
-          isActive={windowOrder[0] === "error"}
-          zIndex={getZIndex("error")}
-          onActivate={() => bringToFront("error")}
-          onClose={() => toggleWindow("error", false)}
-          floating={true}
-        >
-          <div className="p-3 flex gap-3 items-start">
-            <AlertTriangle className="w-7 h-7 text-yellow-500 shrink-0" />
-            <div>
-              <p className="text-sm font-bold text-gray-800">404: Tribe Not Found?</p>
-              <p className="text-[11px] mt-1 text-gray-600 leading-relaxed">
-                If you can&apos;t find your tribe in the wild, you must build one at Hack47. Delhi is waiting for your next big thing.
-              </p>
-              <button
-                onClick={() => toggleWindow("error", false)}
-                className="mt-3 bg-win-grey win-border-outset px-5 py-1 text-xs font-bold active:translate-x-px active:translate-y-px hover:brightness-105"
-              >
-                OK
-              </button>
-            </div>
-          </div>
+      {openWindows.about && (
+        <WinWindow id="about" title="ABOUT.SYS" startX={layout.about.x} startY={layout.about.y}
+          className="w-[36vw] min-w-[250px] max-w-[320px]"
+          isActive={windowOrder[0] === "about"} zIndex={getZIndex("about")}
+          onActivate={() => bringToFront("about")} onClose={() => toggleWindow("about", false)} floating={true}>
+          <AboutContent />
         </WinWindow>
       )}
 
-      {/* ═══════ SELL YOUR SOUL — center CTA ═══════ */}
-
-      {openWindows.soul && (
-        <WinWindow
-          id="soul"
-          title="⚠ SELL_YOUR_SOUL.EXE"
-          startX={layout.soul.x}
-          startY={layout.soul.y}
-          className="w-[32vw] min-w-[250px] max-w-[300px]"
-          titleBarClassName="bg-[#cc0000]"
-          isActive={windowOrder[0] === "soul"}
-          zIndex={getZIndex("soul")}
-          onActivate={() => bringToFront("soul")}
-          onClose={() => toggleWindow("soul", false)}
-          floating={true}
-        >
-          <div className="p-4 text-center font-mono">
-            <p className="text-xl font-bold mb-2">👹</p>
-            <p className="font-bold text-sm uppercase tracking-wide mb-2">SELL US YOUR SOUL</p>
-            <p className="text-[10px] text-gray-600 mb-4 leading-relaxed">
-              30 days. No distractions. Pure building.<br />
-              In exchange, we take your soul (and your sleep schedule).
-            </p>
-            <button
-              onClick={() => setShowForm(true)}
-              className="w-full bg-red-600 text-white py-2 font-bold text-xs uppercase tracking-wider hover:bg-red-700 active:translate-y-px transition-all shadow-[3px_3px_0px_rgba(0,0,0,0.3)]"
-            >
-              ✦ I ACCEPT — APPLY NOW ✦
-            </button>
-            <p className="text-[8px] text-gray-400 mt-2 italic">Terms: No refunds on sleep lost.</p>
-          </div>
+      {openWindows.fitness && (
+        <WinWindow id="fitness" title="🏋️ GET_FIT.EXE" startX={layout.about.x + 80} startY={layout.about.y - 60}
+          className="w-[36vw] min-w-[260px] max-w-[340px]" titleBarClassName="bg-[#e76f51]"
+          isActive={windowOrder[0] === "fitness"} zIndex={getZIndex("fitness")}
+          onActivate={() => bringToFront("fitness")} onClose={() => toggleWindow("fitness", false)} floating={true}>
+          <FitnessContent />
         </WinWindow>
       )}
 
-      {/* ═══════ EXTRA WINDOWS (open from desktop icons) ═══════ */}
-
-      {openWindows.team && (
-        <WinWindow
-          id="team"
-          title="ARCHDEMONS.SYS"
-          startX={layout.team.x}
-          startY={layout.team.y}
-          className="w-[40vw] min-w-[280px] max-w-[360px]"
-          titleBarClassName="bg-[#4a0000]"
-          isActive={windowOrder[0] === "team"}
-          zIndex={getZIndex("team")}
-          onActivate={() => bringToFront("team")}
-          onClose={() => toggleWindow("team", false)}
-          floating={true}
-        >
-          <TheDevils />
-        </WinWindow>
-      )}
-
-      {openWindows.residents && (
-        <WinWindow
-          id="residents"
-          title="RESIDENTS.DAT"
-          startX={layout.residents.x}
-          startY={layout.residents.y}
-          className="w-[36vw] min-w-[240px] max-w-[300px]"
-          titleBarClassName="bg-[#006400]"
-          isActive={windowOrder[0] === "residents"}
-          zIndex={getZIndex("residents")}
-          onActivate={() => bringToFront("residents")}
-          onClose={() => toggleWindow("residents", false)}
-          floating={true}
-        >
-          <ResidentsPanel />
-        </WinWindow>
-      )}
-
-      {openWindows.specs && (
-        <WinWindow
-          id="specs"
-          title="SYSTEM_SPECS.INF"
-          startX={layout.specs.x}
-          startY={layout.specs.y}
-          className="w-[36vw] min-w-[230px] max-w-[290px]"
-          isActive={windowOrder[0] === "specs"}
-          zIndex={getZIndex("specs")}
-          onActivate={() => bringToFront("specs")}
-          onClose={() => toggleWindow("specs", false)}
-          floating={true}
-        >
-          <SystemSpecs />
-        </WinWindow>
-      )}
-
-      {/* Clippy Buddy */}
+      {/* Your avatar mascot */}
       <div className="absolute bottom-11 right-4 z-[9000]">
         <div className={cn(
-          "absolute bottom-full right-0 mb-3 w-44 p-2.5 bg-[#ffffcc] border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,0.3)] text-[10px] leading-snug transition-all duration-300 origin-bottom-right pointer-events-none",
+          "absolute bottom-full right-0 mb-3 w-48 p-2.5 bg-[#ffffcc] border-2 border-black shadow-[3px_3px_0px_rgba(0,0,0,0.3)] text-[10px] leading-snug transition-all duration-300 origin-bottom-right pointer-events-none",
           clippyVisible ? "scale-100 opacity-100" : "scale-0 opacity-0"
         )}>
-          <p className="text-black font-mono">It looks like you&apos;re trying to build the next big thing. Need a spot at Hack47?</p>
+          <p className="text-black font-mono">i do business with pleasure. catch me vibing or building — no in between 🎧</p>
           <div className="absolute top-full right-4 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-black" />
         </div>
-        <img
-          src={SHIELD_SVG}
-          className="w-11 h-11 cursor-pointer contrast-200 grayscale brightness-200 hover:scale-110 active:scale-95 transition-all"
-          style={{ filter: "hue-rotate(90deg) brightness(2.5)" }}
+        <div
+          className="w-12 h-12 cursor-pointer hover:scale-110 active:scale-95 transition-all rounded-full overflow-hidden border-2 border-electric-yellow shadow-[0_0_20px_rgba(250,255,0,0.5)] animate-pulse"
           onClick={() => setClippyVisible((v) => !v)}
-          alt="Clippy Buddy"
-        />
+        >
+          <img src="/rishul.jpeg" alt="Rishul" className="w-full h-full object-cover" />
+        </div>
       </div>
-
-      {/* ═══════ TYPEFORM OVERLAY ═══════ */}
-      {showForm && <SoulForm onClose={() => setShowForm(false)} />}
 
       <Taskbar
         activeTasks={activeTasks}
         onTaskClick={(id) => { toggleWindow(id, true); bringToFront(id); }}
-        onStartClick={() => toggleWindow("error", true)}
+        onStartClick={() => {
+          setOpenWindows({ main: true, now: true, contact: true, fitness: true, about: true });
+        }}
       />
     </div>
   );
 }
 
-// ─── House Photos Gallery ────────────────────────────────────────────────────
+// ─── RISHUL.EXE — Hero ───────────────────────────────────────────────────────
 
-const HOUSE_PHOTOS = [
-  { src: "https://images.unsplash.com/photo-1670589953882-b94c9cb380f5?auto=format&w=600&q=80&fit=crop", caption: "View from the 'Thinking Spot'. Birds included." },
-  { src: "https://images.pexels.com/photos/19977288/pexels-photo-19977288.jpeg?auto=compress&cs=tinysrgb&w=600&q=80", caption: "The Arena. Where 4AM brainwaves happen." },
-  { src: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&w=600&q=80", caption: "Common area. Whiteboards > walls." },
-  { src: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&w=600&q=80", caption: "The workspace. Dual monitors provided." },
-];
-
-function HousePhotosGallery() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const next = () => setCurrentIndex((i) => (i + 1) % HOUSE_PHOTOS.length);
-  const prev = () => setCurrentIndex((i) => (i - 1 + HOUSE_PHOTOS.length) % HOUSE_PHOTOS.length);
-  const photo = HOUSE_PHOTOS[currentIndex];
-
+function RishulBio() {
   return (
-    <div>
-      <img src={photo.src} className="w-full h-[140px] object-cover" alt={photo.caption} />
-      <div className="flex items-center justify-between px-2 py-1.5 bg-gray-100 border-t border-gray-200">
-        <button onClick={prev} className="px-2 py-0.5 bg-win-grey win-border-outset text-[10px] font-bold active:translate-x-px active:translate-y-px">◀ Prev</button>
-        <span className="text-[10px] font-mono text-gray-500">{currentIndex + 1} / {HOUSE_PHOTOS.length}</span>
-        <button onClick={next} className="px-2 py-0.5 bg-win-grey win-border-outset text-[10px] font-bold active:translate-x-px active:translate-y-px">Next ▶</button>
-      </div>
-      <p className="px-2 py-1.5 text-[9px] font-mono italic text-gray-600 bg-gray-50 border-t border-gray-200">{photo.caption}</p>
-    </div>
-  );
-}
-
-// ─── The Devils (Team) ───────────────────────────────────────────────────────
-
-function TheDevils() {
-  return (
-    <div className="p-4 font-mono bg-[#ffffff]">
-      <div className="text-center mb-4">
-        <p className="text-xs font-bold uppercase tracking-widest text-red-700 mb-1">👹 THE ARCHDEMONS 👹</p>
-        <p className="text-[9px] text-gray-500 italic">The ones who summoned this chaos into existence</p>
-      </div>
-
-      <div className="space-y-4">
-        {/* Rishul */}
-        <div className="flex gap-3 items-start p-2 border border-gray-300 bg-[#f8f8f8]">
-          <img
-            src="/rishul.jpeg"
-            alt="Rishul Chanana"
-            className="w-16 h-16 object-cover border-2 border-red-800"
-          />
-          <div className="flex-1 min-w-0">
-            <p className="font-bold text-[11px]">Rishul Chanana</p>
-            <p className="text-[9px] text-red-700 uppercase tracking-wider mb-1.5">Archdemon I</p>
-            <div className="flex gap-2">
-              <a href="https://www.linkedin.com/in/rishul-chanana/" target="_blank" rel="noopener noreferrer" className="text-[9px] text-blue-600 hover:underline">LinkedIn ↗</a>
-              <a href="https://x.com/rishhul" target="_blank" rel="noopener noreferrer" className="text-[9px] text-gray-700 hover:underline">𝕏 ↗</a>
-            </div>
-          </div>
-        </div>
-
-        {/* Pratyush */}
-        <div className="flex gap-3 items-start p-2 border border-gray-300 bg-[#f8f8f8]">
-          <img
-            src="/pratyush.jpeg"
-            alt="Pratyush Pandey"
-            className="w-16 h-16 object-cover border-2 border-red-800"
-          />
-          <div className="flex-1 min-w-0">
-            <p className="font-bold text-[11px]">Pratyush Pandey</p>
-            <p className="text-[9px] text-red-700 uppercase tracking-wider mb-1.5">Archdemon II</p>
-            <div className="flex gap-2">
-              <a href="https://www.linkedin.com/in/pratyush-pandey-09b35b219" target="_blank" rel="noopener noreferrer" className="text-[9px] text-blue-600 hover:underline">LinkedIn ↗</a>
-              <a href="https://x.com/P_Pratyush7" target="_blank" rel="noopener noreferrer" className="text-[9px] text-gray-700 hover:underline">𝕏 ↗</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-4 pt-3 border-t border-gray-300 text-center">
-        <p className="text-[8px] text-gray-400 italic">These two traded their souls first. Now they collect yours.</p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Residents Panel ─────────────────────────────────────────────────────────
-
-function ResidentsPanel() {
-  const filled = 0;
-  const total = 16;
-
-  return (
-    <div className="p-3 font-mono text-[10px]">
-      <p className="font-bold mb-2">RESIDENT SLOTS — BATCH #001</p>
-      <div className="mb-3">
-        <div className="flex justify-between text-[9px] mb-1">
-          <span>Capacity</span>
-          <span className="font-bold text-green-600">ALL {total} SLOTS OPEN</span>
-        </div>
-        <div className="w-full h-4 bg-gray-200 border border-gray-400">
-          <div className="h-full bg-green-500 transition-all" style={{ width: `0%` }} />
-        </div>
-      </div>
-      <div className="space-y-1 text-[9px] mb-3">
-        <p className="text-gray-400">░░░░░░░░░░░░░░░░ {total} spots available</p>
-        <p className="text-green-600 font-bold">First come, first served.</p>
-      </div>
-      <div className="border-t border-gray-300 pt-2 text-[9px]">
-        <p className="mb-1">No residents yet. Be the first.</p>
-        <p className="text-gray-500 italic">Applications open now.</p>
-      </div>
-    </div>
-  );
-}
-
-// ─── Soul Form (Typeform-style) ──────────────────────────────────────────────
-
-const FORM_QUESTIONS = [
-  { id: "name", label: "What do they call you, mortal?", type: "text", placeholder: "Your full name" },
-  { id: "email", label: "Your email. We need a way to summon you.", type: "email", placeholder: "soul@builder.dev" },
-  { id: "phone", label: "Phone number. For when the WiFi dies and demons need to reach you.", type: "tel", placeholder: "+91 ..." },
-  { id: "instagram", label: "Your Instagram. We want to see your life before we consume it.", type: "text", placeholder: "@your_handle" },
-  { id: "linkedin", label: "LinkedIn — show us the professional mask you wear.", type: "text", placeholder: "linkedin.com/in/..." },
-  { id: "twitter", label: "X (Twitter) — where your real thoughts live.", type: "text", placeholder: "@handle or x.com/..." },
-  { id: "brag", label: "BRAG SHEET — This is your altar. Lay down every offering: projects shipped, hackathons won, repos that slap, startups launched, communities built. Attach links. Be shameless.", type: "textarea", placeholder: "I built a...\ngithub.com/...\ntwitter.com/...\nproducthunt.com/..." },
-  { id: "icecream", label: "The most important question of your life: What is the BEST ice cream flavor?", type: "text", placeholder: "Choose wisely. This matters more than your resume." },
-  { id: "failure", label: "What's the biggest failure you've experienced? What was the most breaking point of your life — the moment everything crumbled? And how did you crawl back?", type: "textarea", placeholder: "The devil respects honesty..." },
-  { id: "caffeine", label: "How do you take your caffeine? The devil needs to know your poison. ☕", type: "text", placeholder: "Black coffee at 3AM? Chai? Monster Energy? IV drip?" },
-  { id: "food", label: "House vibes: What food do you prefer? Dietary restrictions? Favorite late-night sin? Drink of choice when the code finally works?", type: "textarea", placeholder: "Veg/non-veg, midnight Maggi, celebratory drink..." },
-  { id: "funding", label: "Would you like to live at Hack47 completely free, or would you be open to contributing some funds? (Your answer does NOT affect your application. Zero impact. We're just asking.)", type: "mcq", placeholder: "", options: ["Completely free — I'm broke and building", "I can chip in a little", "Happy to contribute meaningfully", "Money's not an issue — just let me in"] },
-];
-
-function SoulForm({ onClose }: { onClose: () => void }) {
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [submitted, setSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  const [honeypot, setHoneypot] = useState("");
-  const questionRef = useRef<HTMLDivElement>(null);
-
-  const q = FORM_QUESTIONS[step];
-  const isLast = step === FORM_QUESTIONS.length - 1;
-  const currentValue = answers[q?.id] || "";
-
-  // Animate question transitions
-  useEffect(() => {
-    if (questionRef.current && !submitted) {
-      gsap.fromTo(questionRef.current,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }
-      );
-    }
-  }, [step, submitted]);
-
-  // Validation per field
-  function validate(id: string, value: string): string | null {
-    const v = value.trim();
-    if (!v) return "This field is required.";
-
-    switch (id) {
-      case "name":
-        if (v.length < 2) return "Name must be at least 2 characters.";
-        if (v.length > 100) return "Name is too long.";
-        if (!/^[a-zA-Z\s'.()-]+$/.test(v)) return "Name contains invalid characters.";
-        return null;
-
-      case "email":
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return "Enter a valid email address.";
-        if (v.length > 254) return "Email is too long.";
-        return null;
-
-      case "phone":
-        // Strip spaces, dashes, parens for validation
-        const digits = v.replace(/[\s\-().+]/g, "");
-        if (!/^\d{7,15}$/.test(digits)) return "Enter a valid phone number (7-15 digits).";
-        return null;
-
-      case "instagram":
-        // Accept @handle or full URL
-        if (!/^@?[\w.]+$/.test(v) && !/instagram\.com\/[\w.]+/i.test(v)) {
-          return "Enter a valid Instagram handle (@username) or profile URL.";
-        }
-        return null;
-
-      case "linkedin":
-        if (!/linkedin\.com\/in\/[\w-]+/i.test(v) && !/^[\w-]+$/.test(v)) {
-          return "Enter a valid LinkedIn profile URL (linkedin.com/in/...).";
-        }
-        return null;
-
-      case "twitter":
-        // Accept @handle or x.com/... or twitter.com/...
-        if (!/^@[\w]+$/.test(v) && !/(x\.com|twitter\.com)\/[\w]+/i.test(v) && !/^[\w]+$/.test(v)) {
-          return "Enter a valid X/Twitter handle (@username) or profile URL.";
-        }
-        return null;
-
-      case "brag":
-        if (v.length < 50) return "C'mon, brag more. At least 50 characters. Show us what you've got.";
-        if (v.length > 5000) return "Max 5000 characters. Edit it down.";
-        return null;
-
-      case "icecream":
-        if (v.length < 2) return "Seriously, just name a flavor.";
-        if (v.length > 100) return "It's an ice cream flavor, not an essay.";
-        return null;
-
-      case "failure":
-        if (v.length < 30) return "Give us more than that. At least 30 characters.";
-        if (v.length > 5000) return "Max 5000 characters.";
-        return null;
-
-      case "caffeine":
-        if (v.length < 2) return "Just tell us your poison.";
-        if (v.length > 200) return "Keep it under 200 characters.";
-        return null;
-
-      case "food":
-        if (v.length < 10) return "Tell us a bit more. At least 10 characters.";
-        if (v.length > 2000) return "Max 2000 characters.";
-        return null;
-
-      case "funding":
-        if (!v) return "Pick an option.";
-        return null;
-
-      default:
-        return null;
-    }
-  }
-
-  const handleNext = () => {
-    const validationError = validate(q.id, currentValue);
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-    setError("");
-
-    if (isLast) {
-      // Bot check: if honeypot field is filled, silently fake success
-      if (honeypot) {
-        setSubmitted(true);
-        return;
-      }
-
-      // Prevent double submission
-      if (isSubmitting) return;
-      setIsSubmitting(true);
-
-      // Submit to Google Sheets
-      fetch("https://script.google.com/macros/s/AKfycbxfqO1VrEUves58l8qfU6Jq2sKUwawN4SLBi4TXOOHjO8vpoV7_HMvtocGUiLtLmi7DTA/exec", {
-        method: "POST",
-        body: JSON.stringify(answers),
-      }).catch(() => {});
-      setSubmitted(true);
-    } else {
-      setStep((s) => s + 1);
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && q.type !== "textarea" && currentValue.trim()) {
-      handleNext();
-    }
-    if (e.key === "Enter" && e.ctrlKey && q.type === "textarea" && currentValue.trim()) {
-      handleNext();
-    }
-  };
-
-  // Clear error when user types
-  const handleChange = (value: string) => {
-    setAnswers((a) => ({ ...a, [q.id]: value }));
-    if (error) setError("");
-  };
-
-  if (submitted) {
-    return (
-      <div className="fixed inset-0 z-[10000] bg-black flex items-center justify-center p-4">
-        <div className="absolute inset-0 opacity-20" style={{ background: "radial-gradient(ellipse at center, #660000 0%, transparent 70%)" }} />
-        <div className="text-center font-mono max-w-md relative z-10">
-          <p className="text-6xl mb-4 animate-pulse">👹</p>
-          <p className="text-red-500 text-2xl font-bold mb-3 uppercase tracking-widest">SOUL RECEIVED.</p>
-          <p className="text-red-300/80 text-sm mb-6">Your offering has been accepted. We&apos;ll reach out if your soul is... sufficient.</p>
-          <div className="bg-gray-950 border border-red-900/50 p-4 text-[10px] text-red-400/70 mb-6 text-left">
-            <p>&gt; Transaction complete</p>
-            <p>&gt; Soul integrity: SCANNING...</p>
-            <p>&gt; Soul integrity: <span className="text-green-500">VERIFIED</span></p>
-            <p>&gt; Added to the queue of the damned</p>
-            <p>&gt; Expected response: 48-72 hours</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="bg-red-700 text-white px-8 py-2 font-bold text-sm hover:bg-red-600 active:translate-y-px transition-all border border-red-500/50 shadow-[0_0_20px_rgba(200,0,0,0.3)]"
-          >
-            RETURN TO THE MORTAL REALM
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 overflow-hidden">
-      {/* Dark hellish background */}
-      <div className="absolute inset-0 bg-black" />
-      <div className="absolute inset-0 opacity-30" style={{ background: "radial-gradient(ellipse at bottom, #4a0000 0%, transparent 60%)" }} />
-      <div className="absolute inset-0 opacity-10" style={{ background: "radial-gradient(circle at top right, #ff0000 0%, transparent 40%)" }} />
-
-      {/* Floating ember particles (CSS animated) */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-red-500/60 rounded-full animate-ping"
-            style={{
-              left: `${10 + Math.random() * 80}%`,
-              top: `${10 + Math.random() * 80}%`,
-              animationDuration: `${2 + Math.random() * 3}s`,
-              animationDelay: `${Math.random() * 2}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="w-full max-w-lg relative z-10" ref={questionRef}>
-        {/* Progress bar */}
-        <div className="mb-8">
-          <div className="flex justify-between text-[10px] font-mono text-red-400/60 mb-1.5">
-            <span>RITUAL {step + 1} OF {FORM_QUESTIONS.length}</span>
-            <span>{Math.round(((step + 1) / FORM_QUESTIONS.length) * 100)}% CONSUMED</span>
-          </div>
-          <div className="w-full h-1.5 bg-gray-900 border border-red-900/30 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-red-700 to-red-500 transition-all duration-500 shadow-[0_0_8px_rgba(255,0,0,0.5)]"
-              style={{ width: `${((step + 1) / FORM_QUESTIONS.length) * 100}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Question */}
-        <div className="mb-8">
-          <p className="text-white/90 font-mono text-sm md:text-base leading-relaxed mb-5">{q.label}</p>
-          {q.type === "mcq" && "options" in q ? (
-            <div className="space-y-2">
-              {(q as { options: string[] }).options.map((option: string, i: number) => (
-                <button
-                  key={i}
-                  onClick={() => handleChange(option)}
-                  className={cn(
-                    "w-full text-left px-4 py-3 font-mono text-sm border transition-all",
-                    currentValue === option
-                      ? "border-red-500 bg-red-950/50 text-white shadow-[0_0_10px_rgba(200,0,0,0.2)]"
-                      : "border-red-900/30 bg-transparent text-gray-400 hover:border-red-700/50 hover:text-white"
-                  )}
-                >
-                  <span className="text-red-500 mr-2">{String.fromCharCode(65 + i)}.</span>
-                  {option}
-                </button>
-              ))}
-            </div>
-          ) : q.type === "textarea" ? (
-            <textarea
-              autoFocus
-              value={currentValue}
-              onChange={(e) => handleChange(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={q.placeholder}
-              className={cn(
-                "w-full bg-transparent border-b-2 text-white font-mono text-sm p-3 outline-none resize-none h-36 placeholder:text-red-900/50 transition-colors",
-                error ? "border-red-500" : "border-red-900/40 focus:border-red-500"
-              )}
-            />
-          ) : (
-            <input
-              autoFocus
-              type={q.type}
-              value={currentValue}
-              onChange={(e) => handleChange(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={q.placeholder}
-              className={cn(
-                "w-full bg-transparent border-b-2 text-white font-mono text-lg p-3 outline-none placeholder:text-red-900/50 transition-colors",
-                error ? "border-red-500" : "border-red-900/40 focus:border-red-500"
-              )}
-            />
-          )}
-          {error && (
-            <p className="text-red-400 text-[11px] mt-2 font-mono animate-pulse">⚠ {error}</p>
-          )}
-          {!error && q.type === "textarea" && (
-            <p className="text-[9px] text-red-800/60 mt-1.5 font-mono">Ctrl+Enter to proceed deeper</p>
-          )}
-        </div>
-
-        {/* Honeypot - hidden from humans, bots fill it */}
-        <input
-          type="text"
-          name="website_url"
-          value={honeypot}
-          onChange={(e) => setHoneypot(e.target.value)}
-          tabIndex={-1}
-          autoComplete="off"
-          className="absolute opacity-0 pointer-events-none h-0 w-0 overflow-hidden"
-          aria-hidden="true"
-        />
-
-        {/* Navigation */}
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2">
-            {step > 0 && (
-              <button
-                onClick={() => setStep((s) => s - 1)}
-                className="px-4 py-1.5 bg-gray-900 text-red-300/70 font-mono text-xs border border-red-900/30 hover:border-red-700/50 hover:text-red-200 transition-colors"
-              >
-                ← BACK
-              </button>
-            )}
-            <button
-              onClick={onClose}
-              className="px-4 py-1.5 text-gray-700 font-mono text-xs hover:text-gray-400 transition-colors"
-            >
-              FLEE
-            </button>
-          </div>
-          <button
-            onClick={handleNext}
-            disabled={!currentValue.trim() || isSubmitting}
-            className="px-6 py-2 bg-red-700 text-white font-mono text-xs font-bold uppercase tracking-wider disabled:opacity-20 disabled:cursor-not-allowed hover:bg-red-600 active:translate-y-px transition-all border border-red-500/30 shadow-[0_0_15px_rgba(200,0,0,0.2)]"
-          >
-            {isSubmitting ? "SUBMITTING..." : isLast ? "🔥 SUBMIT SOUL" : "NEXT →"}
-          </button>
-        </div>
-
-        {/* Keyboard hint */}
-        <p className="text-[9px] text-red-900/50 font-mono mt-8 text-center">
-          {q.type !== "textarea" ? "Press Enter ↵ to descend further" : ""}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ─── System Specs ────────────────────────────────────────────────────────────
-
-function SystemSpecs() {
-  return (
-    <div className="p-3 font-mono text-[10px]">
-      <p className="font-bold text-gray-800 mb-2 underline">HACK47 HOUSE — DEVICE MANAGER</p>
-      <div className="space-y-2 text-[9px]">
-        <div className="border-b border-gray-200 pb-1.5">
-          <p className="font-bold text-blue-700">📍 LOCATION</p>
-          <p className="text-gray-600 pl-3">Delhi, Premium Villa</p>
-          <p className="text-gray-600 pl-3">4BHK + Terrace + Garden</p>
-        </div>
-        <div className="border-b border-gray-200 pb-1.5">
-          <p className="font-bold text-green-700">🖥 COMPUTE</p>
-          <p className="text-gray-600 pl-3">Desks: 16 (ergonomic)</p>
-          <p className="text-gray-600 pl-3">Monitors: Available on request</p>
-          <p className="text-gray-600 pl-3">Power backup: 24/7 inverter</p>
-        </div>
-        <div className="border-b border-gray-200 pb-1.5">
-          <p className="font-bold text-purple-700">📡 NETWORK</p>
-          <p className="text-gray-600 pl-3">WiFi: 1Gbps Symmetric Fiber</p>
-          <p className="text-gray-600 pl-3">Backup: 4G failover</p>
-          <p className="text-gray-600 pl-3">Latency: &lt;5ms to AWS Mumbai</p>
-        </div>
-        <div className="border-b border-gray-200 pb-1.5">
-          <p className="font-bold text-orange-700">☕ FUEL SYSTEM</p>
-          <p className="text-gray-600 pl-3">RAM: Unlimited chai & coffee</p>
-          <p className="text-gray-600 pl-3">Storage: 3 meals/day (high protein)</p>
-          <p className="text-gray-600 pl-3">Cache: Snack bar 24/7</p>
-        </div>
+    <div className="p-3 md:p-4">
+      <div className="flex items-start gap-3 mb-3">
+        <img src="/rishul.jpeg" alt="Rishul Chanana" className="w-16 h-16 object-cover border-2 border-gray-400 shadow-[2px_2px_0px_rgba(0,0,0,0.4)]" />
         <div>
-          <p className="font-bold text-red-700">🌅 GPU (Graphics)</p>
-          <p className="text-gray-600 pl-3">Delhi sunset view</p>
-          <p className="text-gray-600 pl-3">Resolution: 4K terrace panorama</p>
-          <p className="text-gray-600 pl-3">Refresh rate: Every evening</p>
+          <h1 className="font-[var(--font-anton)] text-[clamp(36px,6vw,80px)] leading-none tracking-tighter text-black uppercase select-none whitespace-nowrap">
+            RISHUL<span className="text-[clamp(20px,3vw,40px)]">.SPACE</span>
+          </h1>
+          <p className="text-[10px] text-gray-500 font-mono">the personal OS of rishul chanana</p>
         </div>
+      </div>
+      <div className="bg-black text-electric-yellow p-2 md:p-3 font-mono text-[9px] md:text-[11px] mb-3 border-l-4 border-electric-yellow">
+        <p>&gt; LOADING RISHUL_OS v2.0...</p>
+        <p>&gt; STATUS: VIBING + BUILDING</p>
+        <p>&gt; LOCATION: CHANDIGARH / DELHI / BANGALORE</p>
+        <p>&gt; MODE: business with pleasure</p>
+      </div>
+      <p className="font-serif italic text-[clamp(11px,1.3vw,16px)] text-gray-700 leading-snug border-l-4 border-gray-300 pl-2">
+        &quot;i do business with pleasure and i like to have fun. the rest you can figure out from the vibes.&quot;
+      </p>
+    </div>
+  );
+}
+
+// ─── NOW.TXT ─────────────────────────────────────────────────────────────────
+
+function NowContent() {
+  return (
+    <div className="p-3 font-mono text-[11px] text-black">
+      <p className="font-bold underline mb-3 uppercase">ACTIVE_PROCESSES.EXE:</p>
+      <ul className="space-y-2.5 mb-4">
+        <li>→ <span className="font-bold">Collision</span> — mental performance brand. <a href="https://usecollision.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">usecollision.com ↗</a></li>
+        <li>→ <span className="font-bold">Hack47</span> — Delhi&apos;s first hacker house. <a href="https://hack47.org" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">hack47.org ↗</a></li>
+        <li>→ <span className="font-bold">Writing</span> — 3AM essays on Medium.</li>
+        <li>→ <span className="font-bold">Drug Dealing</span> — digitizing pharma companies.</li>
+      </ul>
+      <div className="p-2 border-2 border-dashed border-red-500 bg-red-50/70">
+        <p className="text-[10px] leading-relaxed text-black">⚠ highly productive. may cause career pivots.</p>
       </div>
     </div>
   );
 }
 
-// ─── Nature Layer ────────────────────────────────────────────────────────────
+// ─── CONTACT.EXE ─────────────────────────────────────────────────────────────
 
-function NatureLayer() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [elements, setElements] = useState<{
-    clouds: { id: number; src: string; width: number; top: number; startX: number }[];
-    birds: { id: number; top: number }[];
-    flowers: { id: number; bottom: number; left: number }[];
-  }>({ clouds: [], birds: [], flowers: [] });
-
-  useEffect(() => {
-    const newClouds = [...Array(12)].map((_, i) => ({
-      id: i,
-      src: CLOUD_URLS[i % 2],
-      width: 120 + Math.random() * 280,
-      top: -5 + Math.random() * 75,
-      startX: -20 + Math.random() * 110,
-    }));
-
-    const newBirds = [...Array(5)].map((_, i) => ({
-      id: i,
-      top: 10 + Math.random() * 50,
-    }));
-
-    const newFlowers = [...Array(8)].map((_, i) => ({
-      id: i,
-      bottom: Math.random() * 80,
-      left: Math.random() * 100,
-    }));
-
-    setElements({ clouds: newClouds, birds: newBirds, flowers: newFlowers });
-  }, []);
-
-  useEffect(() => {
-    if (!containerRef.current || elements.clouds.length === 0) return;
-
-    const clouds = containerRef.current.querySelectorAll(".cloud");
-    const birds = containerRef.current.querySelectorAll(".bird");
-    const flowers = containerRef.current.querySelectorAll(".flower");
-
-    clouds.forEach((cloud, i) => {
-      const dir = i % 2 === 0 ? 1 : -1;
-      // Continuous horizontal drift
-      gsap.to(cloud, {
-        x: dir * (window.innerWidth * 0.5 + Math.random() * 200),
-        duration: 25 + Math.random() * 30,
-        repeat: -1,
-        yoyo: true,
-        ease: "none",
-      });
-      // Vertical float
-      gsap.to(cloud, {
-        y: `random(-50, 50)`,
-        duration: 6 + Math.random() * 8,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-        delay: Math.random() * 4,
-      });
-    });
-
-    birds.forEach((bird) => {
-      gsap.to(bird, {
-        x: window.innerWidth + 200,
-        y: "random(-60, 60)",
-        duration: 12 + Math.random() * 10,
-        repeat: -1,
-        delay: Math.random() * 12,
-        ease: "none",
-      });
-    });
-
-    flowers.forEach((flower) => {
-      gsap.to(flower, {
-        rotation: 360,
-        duration: 10 + Math.random() * 8,
-        repeat: -1,
-        ease: "none",
-      });
-    });
-  }, [elements]);
-
+function ContactContent() {
   return (
-    <div ref={containerRef} className="absolute inset-0 pointer-events-none z-1 overflow-hidden">
-      {elements.clouds.map((cloud) => (
-        <img
-          key={`cloud-${cloud.id}`}
-          src={cloud.src}
-          className="cloud absolute opacity-35 pointer-events-none"
-          style={{ width: `${cloud.width}px`, top: `${cloud.top}%`, left: `${cloud.startX}%` }}
-          alt=""
-        />
-      ))}
-      {elements.birds.map((bird) => (
-        <img
-          key={`bird-${bird.id}`}
-          src={BIRD_SVG}
-          className="bird absolute w-8 -left-16 opacity-60"
-          style={{ top: `${bird.top}%`, filter: "brightness(0.2)" }}
-          alt=""
-        />
-      ))}
-      {elements.flowers.map((flower) => (
-        <img
-          key={`flower-${flower.id}`}
-          src={FLOWER_SVG}
-          className="flower absolute w-6 opacity-40"
-          style={{ bottom: `${flower.bottom}px`, left: `${flower.left}%`, filter: "hue-rotate(300deg) brightness(1.2)" }}
-          alt=""
-        />
-      ))}
+    <div className="p-4 text-center font-mono">
+      <p className="text-2xl font-bold mb-2">⚡</p>
+      <p className="font-bold text-sm uppercase tracking-wide mb-1">LET&apos;S CONNECT</p>
+      <p className="text-[9px] text-gray-500 mb-4">I&apos;m always down.</p>
+      <div className="space-y-2 text-[11px]">
+        <a href="https://x.com/rishhul" target="_blank" rel="noopener noreferrer"
+          className="block w-full bg-black text-white py-2 font-bold hover:bg-gray-800 transition-colors shadow-[3px_3px_0px_rgba(0,0,0,0.3)]">
+          𝕏 @rishhul
+        </a>
+        <a href="https://www.linkedin.com/in/rishul-chanana/" target="_blank" rel="noopener noreferrer"
+          className="block w-full bg-[#0077b5] text-white py-2 font-bold hover:bg-[#005f8f] transition-colors shadow-[3px_3px_0px_rgba(0,0,0,0.3)]">
+          LinkedIn ↗
+        </a>
+        <a href="https://instagram.com/chanana_rishul" target="_blank" rel="noopener noreferrer"
+          className="block w-full bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white py-2 font-bold hover:opacity-90 transition-opacity shadow-[3px_3px_0px_rgba(0,0,0,0.3)]">
+          @chanana_rishul
+        </a>
+        <a href="mailto:rishulchanana36@gmail.com"
+          className="block w-full bg-win-grey text-black py-2 font-bold hover:brightness-105 transition-all win-border-outset">
+          rishulchanana36@gmail.com
+        </a>
+      </div>
+      <p className="text-[8px] text-gray-400 mt-3 italic">response time: mass destruction level fast</p>
+    </div>
+  );
+}
+
+// ─── ABOUT.SYS — super simple ────────────────────────────────────────────────
+
+function AboutContent() {
+  return (
+    <div className="p-4 font-mono text-[11px]">
+      <p className="font-bold mb-3 text-[12px]">ABOUT.SYS</p>
+      <div className="space-y-3 text-gray-800 leading-relaxed">
+        <p>i do business with pleasure.</p>
+        <p>i like to have fun, build things, meet cool people, and figure the rest out along the way.</p>
+        <p>17. chandigarh. always moving.</p>
+        <p>grab a window, look around, say hi.</p>
+      </div>
+      <div className="mt-4 p-2 bg-black text-electric-yellow text-[9px]">
+        <p>&gt; PHILOSOPHY: life&apos;s too short for boring shit</p>
+        <p>&gt; CURRENT_MOOD: vibing</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── GET_FIT.EXE — fitness journey ──────────────────────────────────────────
+
+function FitnessContent() {
+  return (
+    <div className="p-4 font-mono text-[11px]">
+      <p className="font-bold mb-2 text-[12px]">🏋️ SEE ME GET FIT</p>
+      <div className="space-y-2.5 text-gray-800 leading-relaxed">
+        <p>let&apos;s be real — i&apos;ve always been the fat kid.</p>
+        <p>the one who chose maggi over the gym, every single time. built companies from my bed while eating chips at 3AM. shipped products, not six-packs.</p>
+        <p>but this year? that changes.</p>
+        <p>i&apos;m documenting the entire journey — publicly, transparently, no filter. the weigh-ins, the meals, the workouts, the embarrassing before photos. all of it.</p>
+        <p className="font-bold">because if i can build two companies before finishing school, i can lose this weight too.</p>
+      </div>
+      <div className="mt-4">
+        <a
+          href="https://www.notion.so/maximally/399ecfba8afb80f88ce9ddfb0e11dd75?v=399ecfba8afb80989b46000c08717d58"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full bg-[#e76f51] text-white py-2.5 font-bold text-center text-[12px] uppercase tracking-wider hover:bg-[#d4553b] transition-colors shadow-[3px_3px_0px_rgba(0,0,0,0.3)]"
+        >
+          📊 follow the journey on Notion ↗
+        </a>
+      </div>
+      <div className="mt-3 p-2 bg-black text-electric-yellow text-[9px]">
+        <p>&gt; STATUS: in progress</p>
+        <p>&gt; GOAL: stop being the fat kid</p>
+        <p>&gt; METHOD: discipline {'>'} motivation</p>
+      </div>
     </div>
   );
 }
