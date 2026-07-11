@@ -1,7 +1,8 @@
-import { Anton, IBM_Plex_Mono, Syne } from "next/font/google"
+import { Anton, IBM_Plex_Mono } from "next/font/google"
 import { Metadata } from "next"
 
 import "./globals.css"
+import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils";
 
 const anton = Anton({
@@ -16,23 +17,17 @@ const fontMono = IBM_Plex_Mono({
   variable: "--font-mono",
 })
 
-const syne = Syne({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--font-syne",
-})
-
 export const metadata: Metadata = {
-  metadataBase: new URL("https://rishul.space"),
+  metadataBase: new URL("https://hack47.org"),
   title: {
-    default: "rishul.space",
-    template: "%s | rishul.space",
+    default: "Hack47",
+    template: "%s | Hack47",
   },
-  description: "i do business with pleasure. founder @ collision, devil @ hack47. 18, chandigarh. building things, meeting cool people, figuring it out.",
-  keywords: ["Rishul Chanana", "rishul.space", "founder", "Collision", "Hack47", "builder", "India", "startups", "vibes"],
-  authors: [{ name: "Rishul Chanana" }],
-  creator: "Rishul Chanana",
-  publisher: "Rishul Chanana",
+  description: "Delhi's first hacker house. A 30-day residency for 16 builders who ship fast, sleep less, and build what matters. Delhi. Sept 15 – Oct 15.",
+  keywords: ["hacker house", "Delhi", "residency", "builders", "startup", "coliving", "hackathon", "Hack47", "India"],
+  authors: [{ name: "Hack47" }],
+  creator: "Hack47",
+  publisher: "Hack47",
   robots: {
     index: true,
     follow: true,
@@ -47,25 +42,25 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IN",
-    url: "https://rishul.space",
-    siteName: "rishul.space",
-    title: "rishul.space — i do business with pleasure",
-    description: "founder @ collision. devil @ hack47. 18, chandigarh. building things, vibing, and figuring it out along the way.",
+    url: "https://hack47.org",
+    siteName: "Hack47",
+    title: "Hack47 — Delhi's First Hacker House",
+    description: "30 days. 16 builders. One Delhi villa. No distractions, just shipping. Apply now.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Rishul Chanana — rishul.space",
+        alt: "Hack47 — Delhi's First Hacker House",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "rishul.space",
-    description: "i do business with pleasure. founder @ collision. devil @ hack47. vibing and building.",
+    title: "Hack47 — Delhi's First Hacker House",
+    description: "30 days. 16 builders. One villa. Pure chaos. Apply now.",
     images: ["/og-image.png"],
-    creator: "@rishhul",
+    creator: "@hack47_",
   },
   icons: {
     icon: [
@@ -87,10 +82,10 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, anton.variable, syne.variable)}
+      className={cn("antialiased", fontMono.variable, anton.variable)}
     >
       <body className="bg-black">
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   )

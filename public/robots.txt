@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://rishul.space/sitemap.xml
+Sitemap: https://hack47.org/sitemap.xml

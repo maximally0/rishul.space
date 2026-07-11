@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { Rocket } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 interface TaskbarProps {
   activeTasks: { id: string; title: string }[];
@@ -39,9 +39,9 @@ export const Taskbar: React.FC<TaskbarProps> = ({
         onClick={onStartClick}
         className="start-btn flex items-center gap-1.5 h-full px-4 bg-linear-to-b from-[#388e3c] via-[#4caf50] 50% to-[#388e3c] border-none rounded-tr-[10px] rounded-br-[10px] shadow-[inset_-2px_0_5px_rgba(0,0,0,0.3),inset_2px_2px_2px_rgba(255,255,255,0.4)] hover:brightness-110 active:brightness-90 transition-all cursor-pointer group"
       >
-        <Rocket className="w-5 h-5 text-white brightness-200 group-hover:scale-110 transition-transform" />
+        <ShieldCheck className="w-5 h-5 text-white brightness-200 group-hover:scale-110 transition-transform" />
         <span className="text-white font-bold italic text-sm tracking-tight drop-shadow-[1px_1px_1px_rgba(0,0,0,0.5)] select-none uppercase">
-          rishul
+          start
         </span>
       </button>
 
