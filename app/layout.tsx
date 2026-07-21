@@ -28,8 +28,8 @@ export const metadata: Metadata = {
     default: "rishul.space",
     template: "%s | rishul.space",
   },
-  description: "i do business with pleasure. founder @ collision, devil @ hack47. 18, chandigarh. building things, meeting cool people, figuring it out.",
-  keywords: ["Rishul Chanana", "rishul.space", "founder", "Collision", "Hack47", "builder", "India", "startups", "vibes"],
+  description: "i do business with pleasure. devil @ hack47. 18, chandigarh. building things, meeting cool people, figuring it out.",
+  keywords: ["Rishul Chanana", "rishul.space", "founder", "Hack47", "builder", "India", "startups", "vibes"],
   authors: [{ name: "Rishul Chanana" }],
   creator: "Rishul Chanana",
   publisher: "Rishul Chanana",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     url: "https://rishul.space",
     siteName: "rishul.space",
     title: "rishul.space — i do business with pleasure",
-    description: "founder @ collision. devil @ hack47. 18, chandigarh. building things, vibing, and figuring it out along the way.",
+    description: "devil @ hack47. 18, chandigarh. building things, vibing, and figuring it out along the way.",
     images: [
       {
         url: "/og-image.png",
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "rishul.space",
-    description: "i do business with pleasure. founder @ collision. devil @ hack47. vibing and building.",
+    description: "i do business with pleasure. devil @ hack47. vibing and building.",
     images: ["/og-image.png"],
     creator: "@rishhul",
   },

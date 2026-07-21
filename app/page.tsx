@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { Monitor, Trash2, Globe, Coffee, Dumbbell } from "lucide-react";
+import { Monitor, Trash2, Globe, Coffee } from "lucide-react";
 import { WinWindow } from "@/components/win-window";
 import { DesktopIcon } from "@/components/desktop-icon";
 import { Taskbar } from "@/components/taskbar";
@@ -204,7 +204,7 @@ function MobileView() {
       <MobileCard title="NOW.TXT"><NowContent /></MobileCard>
       <MobileCard title="CONTACT.EXE"><ContactContent /></MobileCard>
       <MobileCard title="ABOUT.SYS"><AboutContent /></MobileCard>
-      <MobileCard title="GET_FIT.EXE"><FitnessContent /></MobileCard>
+
       {/* Photo scatter */}
       <div className="mt-4 mb-4 overflow-x-auto flex gap-2 pb-2">
         {RISHUL_PHOTOS.map((src, i) => (
@@ -234,10 +234,9 @@ function DesktopView() {
     main: true,
     now: true,
     contact: true,
-    fitness: false,
     about: false,
   });
-  const [windowOrder, setWindowOrder] = useState<string[]>(["contact", "main", "now", "fitness", "about"]);
+  const [windowOrder, setWindowOrder] = useState<string[]>(["contact", "main", "now", "about"]);
   const [clippyVisible, setClippyVisible] = useState(false);
   const [layout, setLayout] = useState(computeWindowLayout);
 
@@ -259,7 +258,7 @@ function DesktopView() {
       case "main": return "RISHUL.EXE";
       case "now": return "NOW.TXT";
       case "contact": return "⚡ CONTACT.EXE";
-      case "fitness": return "GET_FIT.EXE";
+
       case "about": return "ABOUT.SYS";
       default: return id;
     }
@@ -286,7 +285,7 @@ function DesktopView() {
         <DesktopIcon icon={Trash2} label="Killed Ideas" onClick={() => alert("💀 RIP: 47 abandoned side projects, 3 startup pivots, and that one app I built at 3AM that made absolutely no sense in daylight.")} />
         <DesktopIcon icon={Globe} label="Socials" onClick={() => toggleWindow("contact", true)} />
         <DesktopIcon icon={Coffee} label="Now" onClick={() => toggleWindow("now", true)} />
-        <DesktopIcon icon={Dumbbell} label="Get Fit" onClick={() => toggleWindow("fitness", true)} />
+
       </div>
 
       {/* ═══════ WINDOWS ═══════ */}
@@ -327,14 +326,7 @@ function DesktopView() {
         </WinWindow>
       )}
 
-      {openWindows.fitness && (
-        <WinWindow id="fitness" title="🏋️ GET_FIT.EXE" startX={layout.about.x + 80} startY={layout.about.y - 60}
-          className="w-[36vw] min-w-[260px] max-w-[340px]" titleBarClassName="bg-[#e76f51]"
-          isActive={windowOrder[0] === "fitness"} zIndex={getZIndex("fitness")}
-          onActivate={() => bringToFront("fitness")} onClose={() => toggleWindow("fitness", false)} floating={true}>
-          <FitnessContent />
-        </WinWindow>
-      )}
+
 
       {/* Your avatar mascot */}
       <div className="absolute bottom-11 right-4 z-[9000]">
@@ -357,7 +349,7 @@ function DesktopView() {
         activeTasks={activeTasks}
         onTaskClick={(id) => { toggleWindow(id, true); bringToFront(id); }}
         onStartClick={() => {
-          setOpenWindows({ main: true, now: true, contact: true, fitness: true, about: true });
+          setOpenWindows({ main: true, now: true, contact: true, about: true });
         }}
       />
     </div>
@@ -398,7 +390,7 @@ function NowContent() {
     <div className="p-3 font-mono text-[11px] text-black">
       <p className="font-bold underline mb-3 uppercase">ACTIVE_PROCESSES.EXE:</p>
       <ul className="space-y-2.5 mb-4">
-        <li>→ <span className="font-bold">Collision</span> — mental performance brand. <a href="https://usecollision.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">usecollision.com ↗</a></li>
+
         <li>→ <span className="font-bold">Hack47</span> — Delhi&apos;s first hacker house. <a href="https://hack47.org" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">hack47.org ↗</a></li>
         <li>→ <span className="font-bold">Writing</span> — 3AM essays on Medium.</li>
         <li>→ <span className="font-bold">Drug Dealing</span> — digitizing pharma companies.</li>
@@ -461,34 +453,4 @@ function AboutContent() {
   );
 }
 
-// ─── GET_FIT.EXE — fitness journey ──────────────────────────────────────────
 
-function FitnessContent() {
-  return (
-    <div className="p-4 font-mono text-[11px]">
-      <p className="font-bold mb-2 text-[12px]">🏋️ SEE ME GET FIT</p>
-      <div className="space-y-2.5 text-gray-800 leading-relaxed">
-        <p>let&apos;s be real — i&apos;ve always been the fat kid.</p>
-        <p>the one who chose maggi over the gym, every single time. built companies from my bed while eating chips at 3AM. shipped products, not six-packs.</p>
-        <p>but this year? that changes.</p>
-        <p>i&apos;m documenting the entire journey — publicly, transparently, no filter. the weigh-ins, the meals, the workouts, the embarrassing before photos. all of it.</p>
-        <p className="font-bold">because if i can build two companies before finishing school, i can lose this weight too.</p>
-      </div>
-      <div className="mt-4">
-        <a
-          href="https://www.notion.so/maximally/399ecfba8afb80f88ce9ddfb0e11dd75?v=399ecfba8afb80989b46000c08717d58"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block w-full bg-[#e76f51] text-white py-2.5 font-bold text-center text-[12px] uppercase tracking-wider hover:bg-[#d4553b] transition-colors shadow-[3px_3px_0px_rgba(0,0,0,0.3)]"
-        >
-          📊 follow the journey on Notion ↗
-        </a>
-      </div>
-      <div className="mt-3 p-2 bg-black text-electric-yellow text-[9px]">
-        <p>&gt; STATUS: in progress</p>
-        <p>&gt; GOAL: stop being the fat kid</p>
-        <p>&gt; METHOD: discipline {'>'} motivation</p>
-      </div>
-    </div>
-  );
-}
