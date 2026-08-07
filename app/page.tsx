@@ -392,6 +392,7 @@ function NowContent() {
       <ul className="space-y-2.5 mb-4">
 
         <li>→ <span className="font-bold">Hack47</span> — Delhi&apos;s first hacker house. <a href="https://hack47.org" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">hack47.org ↗</a></li>
+        <li>→ <span className="font-bold">Collision</span> — the AI you hire to run growth. replaces your whole growth stack: research, write, distribute, learn — one conversation. <a href="https://usecollision.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">usecollision.com ↗</a></li>
         <li>→ <span className="font-bold">Writing</span> — 3AM essays on Medium.</li>
         <li>→ <span className="font-bold">Drug Dealing</span> — digitizing pharma companies.</li>
       </ul>
