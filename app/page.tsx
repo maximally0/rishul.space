@@ -443,7 +443,7 @@ function AboutContent() {
       <div className="space-y-3 text-gray-800 leading-relaxed">
         <p>i do business with pleasure.</p>
         <p>i like to have fun, build things, meet cool people, and figure the rest out along the way.</p>
-        <p>17. chandigarh. always moving.</p>
+        <p>18. chandigarh. always moving.</p>
         <p>grab a window, look around, say hi.</p>
       </div>
       <div className="mt-4 p-2 bg-black text-electric-yellow text-[9px]">
