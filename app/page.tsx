@@ -391,7 +391,6 @@ function NowContent() {
       <p className="font-bold underline mb-3 uppercase">ACTIVE_PROCESSES.EXE:</p>
       <ul className="space-y-2.5 mb-4">
 
-        <li>→ <span className="font-bold">Hack47</span> — Delhi&apos;s first hacker house. <a href="https://hack47.org" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">hack47.org ↗</a></li>
         <li>→ <span className="font-bold">Meritalien</span> — global talent mobility. making exceptional people borderless: O-1A, EB-1A, NIW and UK Global Talent. <a href="https://meritalien.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">meritalien.com ↗</a></li>
         <li>→ <span className="font-bold">Writing</span> — 3AM essays on Medium.</li>
         <li>→ <span className="font-bold">Drug Dealing</span> — digitizing pharma companies.</li>
@@ -420,13 +419,17 @@ function ContactContent() {
           className="block w-full bg-[#0077b5] text-white py-2 font-bold hover:bg-[#005f8f] transition-colors shadow-[3px_3px_0px_rgba(0,0,0,0.3)]">
           LinkedIn ↗
         </a>
+        <a href="https://www.youtube.com/@RishulChananaYT" target="_blank" rel="noopener noreferrer"
+          className="block w-full bg-[#ff0000] text-white py-2 font-bold hover:bg-[#cc0000] transition-colors shadow-[3px_3px_0px_rgba(0,0,0,0.3)]">
+          ▶ YouTube ↗
+        </a>
         <a href="https://instagram.com/chanana_rishul" target="_blank" rel="noopener noreferrer"
           className="block w-full bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] text-white py-2 font-bold hover:opacity-90 transition-opacity shadow-[3px_3px_0px_rgba(0,0,0,0.3)]">
           @chanana_rishul
         </a>
-        <a href="mailto:rishulchanana36@gmail.com"
+        <a href="mailto:hello@rishul.space"
           className="block w-full bg-win-grey text-black py-2 font-bold hover:brightness-105 transition-all win-border-outset">
-          rishulchanana36@gmail.com
+          hello@rishul.space
         </a>
       </div>
       <p className="text-[8px] text-gray-400 mt-3 italic">response time: mass destruction level fast</p>
