@@ -7,17 +7,16 @@ import { WinWindow } from "@/components/win-window";
 import { DesktopIcon } from "@/components/desktop-icon";
 import { Taskbar } from "@/components/taskbar";
 import { cn } from "@/lib/utils";
+import { DESKTOP_PHOTOS } from "@/lib/photos";
 
-const RISHUL_PHOTOS = [
-  "/rishul-1.jpeg",
-  "/rishul-2.jpeg",
-  "/rishul-3.jpeg",
-  "/rishul-4.jpeg",
-  "/rishul-5.jpeg",
-  "/rishul-6.jpeg",
-  "/rishul-7.jpeg",
-  "/rishul-8.jpeg",
+const SIDE_PROJECTS = [
+  { label: "hack47.org", url: "https://hack47.org", note: "hacker houses around india" },
+  { label: "maxmomentum.co", url: "https://maxmomentum.co" },
+  { label: "loftrobotics.org", url: "https://loftrobotics.org" },
+  { label: "salesclaw.app", url: "https://salesclaw.app" },
 ];
+
+const PHOTO_SRCS = DESKTOP_PHOTOS.map((p) => p.src);
 
 function computeWindowLayout() {
   if (typeof window === "undefined") {
@@ -69,18 +68,102 @@ function FloatingPhotos() {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Give each photo a random starting position and gentle float
-    photosRef.current.forEach((img) => {
-      if (!img) return;
-      const startX = Math.random() * (window.innerWidth - 120);
-      const startY = Math.random() * (window.innerHeight - 160);
-      gsap.set(img, { x: startX, y: startY, rotation: (Math.random() - 0.5) * 20 });
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const taskbarH = 36;
+    const n = DESKTOP_PHOTOS.length;
 
-      // Random gentle floating
+    // Photos sit in a ring around the edges of the desktop, never in the middle.
+    // Even spacing around the perimeter keeps them from bunching up, and the
+    // inward push is capped so the centre stays clear for the windows.
+    const pad = 10;
+    const H = vh - taskbarH;
+    const w = vw - pad * 2;
+    const h = H - pad * 2;
+    const perim = 2 * (w + h);
+    const maxPush = Math.min(vw, H) * 0.26;
+    // rotate the ring on every load so the arrangement is never the same twice
+    const offset = Math.random();
+
+    const clamp = (lo: number, v: number, hi: number) => Math.max(lo, Math.min(v, hi));
+
+    const slots = DESKTOP_PHOTOS.map((photo, i) => {
+      const size = photo.size ?? 100;
+
+      // walk the rectangle perimeter to get an evenly spaced starting slot
+      let d = ((offset + i / n) % 1) * perim;
+      let bx: number;
+      let by: number;
+      if (d < w) {
+        bx = pad + d; by = pad;
+      } else if (d < w + h) {
+        d -= w; bx = pad + w; by = pad + d;
+      } else if (d < 2 * w + h) {
+        d -= w + h; bx = pad + w - d; by = pad + h;
+      } else {
+        d -= 2 * w + h; bx = pad; by = pad + h - d;
+      }
+
+      // nudge it inward by a random amount, so it reads as scatter rather than
+      // a tidy frame, then keep the whole tile on screen
+      const push = Math.random() * maxPush;
+      const vx = pad + w / 2 - bx;
+      const vy = pad + h / 2 - by;
+      const len = Math.hypot(vx, vy) || 1;
+
+      return {
+        x: clamp(-8, bx + (vx / len) * push, vw - size - 10),
+        y: clamp(34, by + (vy / len) * push, vh - taskbarH - size * 1.34 - 4),
+        tw: size,
+        th: size * 1.34,
+      };
+    });
+
+    // nudge apart anything that landed on top of anything else, so the tiles
+    // read as separate photos instead of a pile
+    const keepOnScreen = (s: { x: number; y: number; tw: number; th: number }) => {
+      s.x = clamp(-8, s.x, vw - s.tw - 10);
+      s.y = clamp(34, s.y, vh - taskbarH - s.th - 4);
+    };
+
+    for (let pass = 0; pass < 4; pass++) {
+      for (let a = 0; a < slots.length; a++) {
+        for (let b = a + 1; b < slots.length; b++) {
+          const A = slots[a];
+          const B = slots[b];
+          const overlapX = (A.tw + B.tw) * 0.62 - Math.abs(B.x - A.x);
+          const overlapY = (A.th + B.th) * 0.62 - Math.abs(B.y - A.y);
+          if (overlapX > 0 && overlapY > 0) {
+            if (overlapX < overlapY) {
+              const shove = (B.x < A.x ? -1 : 1) * overlapX * 0.5;
+              A.x -= shove;
+              B.x += shove;
+            } else {
+              const shove = (B.y < A.y ? -1 : 1) * overlapY * 0.5;
+              A.y -= shove;
+              B.y += shove;
+            }
+          }
+        }
+      }
+      slots.forEach(keepOnScreen);
+    }
+
+    photosRef.current.forEach((img, i) => {
+      if (!img || !slots[i]) return;
+
+      gsap.set(img, {
+        x: slots[i].x,
+        y: slots[i].y,
+        rotation: (Math.random() - 0.5) * 22,
+        scale: 0.92 + Math.random() * 0.16,
+      });
+
+      // gentle float, kept small so nothing drifts back into the middle
       gsap.to(img, {
-        x: `+=${(Math.random() - 0.5) * 200}`,
-        y: `+=${(Math.random() - 0.5) * 150}`,
-        rotation: (Math.random() - 0.5) * 15,
+        x: `+=${(Math.random() - 0.5) * 34}`,
+        y: `+=${(Math.random() - 0.5) * 26}`,
+        rotation: (Math.random() - 0.5) * 8,
         duration: 4 + Math.random() * 4,
         repeat: -1,
         yoyo: true,
@@ -132,16 +215,17 @@ function FloatingPhotos() {
 
   return (
     <div ref={containerRef} className="absolute inset-0 pointer-events-none z-[3] overflow-hidden">
-      {RISHUL_PHOTOS.map((src, i) => (
+      {DESKTOP_PHOTOS.map((photo, i) => (
         <img
-          key={i}
+          key={photo.src}
           ref={(el) => { if (el) photosRef.current[i] = el; }}
-          src={src}
-          alt=""
-          className="absolute w-[100px] h-[130px] object-cover rounded border-[3px] border-white shadow-[4px_4px_20px_rgba(0,0,0,0.4)] opacity-80 hover:opacity-100 transition-opacity pointer-events-auto cursor-grab active:cursor-grabbing"
-          style={{ willChange: "transform" }}
+          src={photo.src}
+          alt={photo.alt ?? ""}
+          className="absolute h-auto max-h-[180px] object-cover rounded border-[3px] border-white shadow-[4px_4px_20px_rgba(0,0,0,0.4)] opacity-80 hover:opacity-100 transition-opacity pointer-events-auto"
+          style={{ width: photo.size ?? 100, willChange: "transform" }}
         />
       ))}
+
     </div>
   );
 }
@@ -207,8 +291,8 @@ function MobileView() {
 
       {/* Photo scatter */}
       <div className="mt-4 mb-4 overflow-x-auto flex gap-2 pb-2">
-        {RISHUL_PHOTOS.map((src, i) => (
-          <img key={i} src={src} alt="" className="h-28 w-auto object-cover rounded border-2 border-white/30 shrink-0 shadow-lg" style={{ transform: `rotate(${(i % 2 === 0 ? -1 : 1) * (2 + i)}deg)` }} />
+        {PHOTO_SRCS.map((src, i) => (
+          <img key={i} src={src} alt="" loading="lazy" className="h-28 w-auto object-cover rounded border-2 border-white/30 shrink-0 shadow-lg" style={{ transform: `rotate(${(i % 2 === 0 ? -1 : 1) * (2 + i)}deg)` }} />
         ))}
       </div>
       <div className="mt-4 text-center text-[9px] text-white/40 border-t border-white/10 pt-4">
@@ -373,7 +457,7 @@ function RishulBio() {
       <div className="bg-black text-electric-yellow p-2 md:p-3 font-mono text-[9px] md:text-[11px] mb-3 border-l-4 border-electric-yellow">
         <p>&gt; LOADING RISHUL_OS v2.0...</p>
         <p>&gt; STATUS: VIBING + BUILDING</p>
-        <p>&gt; LOCATION: CHANDIGARH / DELHI / BANGALORE</p>
+        <p>&gt; LOCATION: CHANDIGARH / BANGALORE</p>
         <p>&gt; MODE: business with pleasure</p>
       </div>
       <p className="font-serif italic text-[clamp(11px,1.3vw,16px)] text-gray-700 leading-snug border-l-4 border-gray-300 pl-2">
@@ -386,16 +470,40 @@ function RishulBio() {
 // ─── NOW.TXT ─────────────────────────────────────────────────────────────────
 
 function NowContent() {
+  const [sideProjectsOpen, setSideProjectsOpen] = useState(false);
+
   return (
     <div className="p-3 font-mono text-[11px] text-black">
       <p className="font-bold underline mb-3 uppercase">ACTIVE_PROCESSES.EXE:</p>
       <ul className="space-y-2.5 mb-4">
 
         <li>→ <span className="font-bold">Meritalien</span> — global talent mobility. making exceptional people borderless: O-1A, EB-1A, NIW and UK Global Talent. <a href="https://meritalien.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">meritalien.com ↗</a></li>
-        <li>→ <span className="font-bold">Writing</span> — 3AM essays on Medium.</li>
-        <li>→ <span className="font-bold">Drug Dealing</span> — digitizing pharma companies.</li>
       </ul>
-      <div className="p-2 border-2 border-dashed border-red-500 bg-red-50/70">
+
+      <button
+        type="button"
+        aria-expanded={sideProjectsOpen}
+        onClick={() => setSideProjectsOpen((v) => !v)}
+        className="w-full flex items-center gap-1.5 bg-win-grey win-border-outset px-1.5 py-1 text-left text-[10px] font-bold uppercase tracking-wide cursor-pointer hover:brightness-105 active:translate-x-px active:translate-y-px"
+      >
+        <span className="text-[8px] leading-none">{sideProjectsOpen ? "▼" : "▶"}</span>
+        Side Projects
+      </button>
+
+      {sideProjectsOpen && (
+        <ul className="mt-2 ml-1 space-y-2 border-l-2 border-dashed border-[#808080] pl-3">
+          {SIDE_PROJECTS.map((project) => (
+            <li key={project.url}>
+              <a href={project.url} target="_blank" rel="noopener noreferrer" className="font-bold text-blue-600 hover:underline">
+                {project.label} ↗
+              </a>
+              {project.note ? <span className="text-gray-500"> — {project.note}</span> : null}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="mt-4 p-2 border-2 border-dashed border-red-500 bg-red-50/70">
         <p className="text-[10px] leading-relaxed text-black">⚠ highly productive. may cause career pivots.</p>
       </div>
     </div>
