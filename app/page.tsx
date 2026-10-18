@@ -476,7 +476,7 @@ function NowContent() {
     <div className="p-3 font-mono text-[11px] text-black">
       <p className="font-bold underline mb-3 uppercase">ACTIVE_PROCESSES.EXE:</p>
       <ul className="space-y-2.5 mb-4">
-
+        <li>→ <span className="font-bold">Max Momentum</span> — we engineer AI-native growth infrastructure by unifying GTM engineering, intelligent automation, media, and data-driven distribution into scalable customer acquisition systems. <a href="https://maxmomentum.co" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">maxmomentum.co ↗</a></li>
         <li>→ <span className="font-bold">Meritalien</span> — global talent mobility. making exceptional people borderless: O-1A, EB-1A, NIW and UK Global Talent. <a href="https://meritalien.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">meritalien.com ↗</a></li>
       </ul>
 
