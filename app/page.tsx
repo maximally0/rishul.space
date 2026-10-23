@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { DESKTOP_PHOTOS } from "@/lib/photos";
 
 const SIDE_PROJECTS = [
-  { label: "hack47.org", url: "https://hack47.org", note: "hacker houses around india" },
+  { label: "hack47.org", url: "https://hack47.org", note: "home for the unconventional" },
   { label: "maxmomentum.co", url: "https://maxmomentum.co", note: "ai-native growth infrastructure: gtm, media, distribution" },
   { label: "loftrobotics.org", url: "https://loftrobotics.org" },
 ];
