@@ -13,7 +13,6 @@ const SIDE_PROJECTS = [
   { label: "hack47.org", url: "https://hack47.org", note: "hacker houses around india" },
   { label: "maxmomentum.co", url: "https://maxmomentum.co", note: "ai-native growth infrastructure: gtm, media, distribution" },
   { label: "loftrobotics.org", url: "https://loftrobotics.org" },
-  { label: "salesclaw.app", url: "https://salesclaw.app" },
 ];
 
 const PHOTO_SRCS = DESKTOP_PHOTOS.map((p) => p.src);
